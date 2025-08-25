@@ -11,11 +11,10 @@ Top-bar result and preferences dialog:
 ## Screenshots
 
 **Top bar**
-![Top bar](screenshots/topbar.png)
+![Top bar](../screenshots/topbar.png)
 
 **Preferences**
-![Preferences](screenshots/prefs.png)
-
+![Preferences](../screenshots/prefs.png)
 
 ## Features
 
