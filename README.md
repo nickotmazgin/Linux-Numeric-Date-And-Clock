@@ -8,8 +8,6 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a numer
 
 Top-bar result and preferences dialog:
 
-## Screenshots
-
 **Preferences**:
 
 ![Preferences](screenshots/prefs.png)
@@ -33,29 +31,53 @@ Top-bar result and preferences dialog:
 
 ---
 
+````markdown
 ## Install
 
 ### A) From **extensions.gnome.org** (recommended)
 
-The extension will be available on E.G.O. soon.
+The extension will be available on E.G.O. soon.  
 Open **Extensions** (or **Extension Manager**) → **Browse** and search for **“Numeric Clock”** (UUID: `numeric-clock@nickotmazgin`) → toggle **On** → **Preferences** to configure.
+
+---
 
 ### B) From a **GitHub release**
 
-Once releases are published here, you can install the packaged zip:
+**Option 1 — specific version (v1.1.0):**
+
+1) Download the attached asset from the release page:  
+   https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/tag/v1.1.0  
+   (file: `numeric-clock@nickotmazgin.shell-extension.zip`)
+
+2) Install & open preferences:
+```bash
+gnome-extensions install --force numeric-clock@nickotmazgin.shell-extension.zip
+gnome-extensions enable numeric-clock@nickotmazgin
+gnome-extensions prefs numeric-clock@nickotmazgin
+````
+
+**Option 2 — always get the latest:**
 
 ```bash
-# 1) Download the latest release asset
-curl -L -o /tmp/numeric-clock.zip \
+# Download the latest release asset
+curl -L -o /tmp/numeric-clock@nickotmazgin.shell-extension.zip \
   https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest/download/numeric-clock@nickotmazgin.shell-extension.zip
 
-# 2) Install the extension for your user
-gnome-extensions install --force /tmp/numeric-clock.zip
-
-# 3) Enable + open preferences
+# Install & open preferences
+gnome-extensions install --force /tmp/numeric-clock@nickotmazgin.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
-gnome-extensions prefs  numeric-clock@nickotmazgin
+gnome-extensions prefs numeric-clock@nickotmazgin
 ```
+
+**Verify checksum (optional, for v1.1.0):**
+
+```bash
+sha256sum numeric-clock@nickotmazgin.shell-extension.zip
+# Expected:
+# 5d1fe9b755fbfcef3d539a63b888ff376717cf88091a3de851845aafd3b74c8d
+```
+
+---
 
 ### C) From source (developer install)
 
@@ -67,19 +89,22 @@ cd Linux-Numeric-Date-And-Clock/numeric-clock@nickotmazgin
 # Compile local schema (dev installs only; do NOT commit the compiled file)
 glib-compile-schemas schemas
 
-# Pack and install for your user
+# Pack & install for your user
 gnome-extensions pack . --force --out-dir /tmp
 gnome-extensions install --force /tmp/numeric-clock@nickotmazgin.shell-extension.zip
 
-# Enable + open preferences
+# Enable & open preferences
 gnome-extensions enable numeric-clock@nickotmazgin
-gnome-extensions prefs  numeric-clock@nickotmazgin
+gnome-extensions prefs numeric-clock@nickotmazgin
 ```
 
-> **Note:** Release/source zips **must not** include `schemas/gschemas.compiled`. It’s generated locally (and is in `.gitignore`).
+> **Note:** Release/source zips **must not** include `schemas/gschemas.compiled`. It’s generated locally (and is ignored via `.gitignore`).
 
----
+```
 
+If you paste that in, the section will render correctly and the links/commands will work.  
+(When you publish v1.1.1+, remember to update the checksum line if you keep a “specific version” example.)
+```
 ## Usage
 
 Open Preferences and set:
