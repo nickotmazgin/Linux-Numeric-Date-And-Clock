@@ -2,7 +2,7 @@
   "uuid": "numeric-clock@nickotmazgin",
   "name": "Numeric Clock",
   "description": "Top-bar clock with a numeric format (DD/MM/YYYY 24-hour).",
-  "version": 110,
+  "version": 1.1.0,
   "shell-version": ["42", "43", "44", "45"],
   "settings-schema": "org.nick.numericclock",
   "url": "https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock"
