@@ -1,5 +1,10 @@
 # Numeric Clock (GNOME Shell Extension)
 
+**Quick links:**  
+• **GNOME Extensions (E.G.O.):** https://extensions.gnome.org/extension/8566/numeric-clock/  
+• **Latest Release (ZIP):** https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest  
+• **Issues / feedback:** https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues
+
 A lightweight GNOME Shell extension that replaces the top-bar clock with a numeric, fully configurable format (e.g., `DD/MM/YYYY HH:MM`). Works on **Wayland and Xorg** (tested on **GNOME 42–45**). Licensed under MIT.
 
 **UUID:** `numeric-clock@nickotmazgin`
