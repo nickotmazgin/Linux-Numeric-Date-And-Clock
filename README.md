@@ -10,13 +10,10 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a numer
 
 **UUID:** `numeric-clock@nickotmazgin`
 
-## Screenshots
+## Screenshot
 
-**Preferences**
-![Preferences](screenshots/prefs.png)
+![Numeric Clock — Top bar & Preferences](screenshots/numeric-clock_screenshot.png)
 
-**Top bar**
-![Top bar](screenshots/topbar.png)
 
 ## Features
 
