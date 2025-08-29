@@ -1,3 +1,6 @@
+
+> Using GNOME **42–44**? See the [`legacy/42-44` branch](../../tree/legacy/42-44) and the legacy ZIP on Releases.
+
 # Numeric Clock (GNOME Shell Extension)
 
 <img src="numeric-clock%40nickotmazgin/icon.png" width="96" align="right" alt="Numeric Clock icon">
