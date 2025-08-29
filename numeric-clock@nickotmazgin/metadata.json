@@ -3,9 +3,12 @@
   "name": "Numeric Clock",
   "description": "Top-bar clock with a numeric format (DD/MM/YYYY 24-hour).",
   "version": 111,
-  "shell-version": ["42", "43", "44"],
+  "shell-version": [
+    "42",
+    "43",
+    "44"
+  ],
   "settings-schema": "org.nick.numericclock",
   "icon": "icon.png",
   "url": "https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock"
 }
-
