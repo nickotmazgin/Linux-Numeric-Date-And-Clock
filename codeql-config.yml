@@ -1,0 +1,10 @@
+name: Numeric Clock CodeQL
+paths:
+  - .
+paths-ignore:
+  - dist/**
+  - screenshots/**
+  - '**/gschemas.compiled'
+  - '**/*.png'
+  - '**/*.svg'
+  - '**/*.zip'
