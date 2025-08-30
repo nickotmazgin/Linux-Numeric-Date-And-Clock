@@ -17,6 +17,9 @@ Works on **GNOME 45+** (Wayland & Xorg). Licensed under **MIT**.
 * **Install on GNOME Extensions (E.G.O.)**: [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
 * **Latest GitHub Release (ZIPs)**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
 * **Issues / feedback**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
+* **Questions / ideas (Discussions)**: https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions
+
+[![Discussions](https://img.shields.io/badge/Discussions-join%20the%20chat-5965e0)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
 
 ---
 
