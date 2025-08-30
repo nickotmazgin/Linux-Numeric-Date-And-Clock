@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-/* Numeric Clock (Wayland) — by Nick Otmazgin */
+/* Numeric Clock (Wayland/Xorg, GNOME 42–44) — by Nick Otmazgin */
 'use strict';
 
 const { Gio, GLib, St } = imports.gi;
@@ -33,15 +33,17 @@ function _textLooksLikeClock(txt) {
   if (!txt) return false;
   const s = String(txt).toLowerCase();
   return TIME_RE.test(s) ||
-         new RegExp(`\\b(${MONTHS})\\b`).test(s) ||
-         new RegExp(`\\b(${DAYS})\\b`).test(s);
+         new RegExp('\\b(' + MONTHS + ')\\b').test(s) ||
+         new RegExp('\\b(' + DAYS   + ')\\b').test(s);
 }
 
 function _allStageLabels() {
   const out = [];
   (function walk(a){
     if (!a || typeof a.get_children !== 'function') return;
-    for (const c of a.get_children()) {
+    const kids = a.get_children();
+    for (let i = 0; i < kids.length; i++) {
+      const c = kids[i];
       if (c instanceof St.Label) out.push(c);
       walk(c);
     }
@@ -53,7 +55,7 @@ function _collectClockLabels() {
   const set = new Set();
 
   // GNOME top-bar DateMenu fields (when present)
-  const dm = Main.panel?.statusArea?.dateMenu;
+  const dm = (Main.panel && Main.panel.statusArea) ? Main.panel.statusArea.dateMenu : null;
   if (dm) {
     if (dm._clockDisplay instanceof St.Label) set.add(dm._clockDisplay);
     if (dm._clock        instanceof St.Label) set.add(dm._clock);
@@ -61,13 +63,15 @@ function _collectClockLabels() {
   }
 
   // Any label that looks like a clock (covers Zorin taskbar etc.)
-  for (const lab of _allStageLabels()) {
+  const all = _allStageLabels();
+  for (let i = 0; i < all.length; i++) {
+    const lab = all[i];
     try {
-      const cls  = (lab.get_style_class_name?.() || '').toLowerCase();
-      const name = (lab.get_name?.() || '').toLowerCase();
-      const txt  = lab.get_text?.() || '';
-      if (cls.includes('clock') || name.includes('clock') ||
-          cls.includes('date')  || name.includes('date')  ||
+      const cls  = (typeof lab.get_style_class_name === 'function' ? lab.get_style_class_name() : '').toLowerCase();
+      const name = (typeof lab.get_name              === 'function' ? lab.get_name()              : '').toLowerCase();
+      const txt  =  typeof lab.get_text              === 'function' ? lab.get_text()              : '';
+      if (cls.indexOf('clock') !== -1 || name.indexOf('clock') !== -1 ||
+          cls.indexOf('date')  !== -1 || name.indexOf('date')  !== -1 ||
           _textLooksLikeClock(txt))
         set.add(lab);
     } catch (_) {}
@@ -77,8 +81,9 @@ function _collectClockLabels() {
 
 function _forcePlain(lab) {
   try {
-    if (lab?.clutter_text && typeof lab.clutter_text.set_use_markup === 'function')
-      lab.clutter_text.set_use_markup(false);
+    const ct = lab && lab.clutter_text;
+    if (ct && typeof ct.set_use_markup === 'function')
+      ct.set_use_markup(false);
   } catch (_) {}
 }
 
@@ -87,30 +92,33 @@ function _applyTo(lab) {
     if (!lab) return;
 
     _forcePlain(lab);
-    if (lab.set_text)
+    if (typeof lab.set_text === 'function')
       lab.set_text(_formatNow(settings.get_string('format-string')));
 
     // If something rewrites it (e.g., Zorin), re-apply once it changes.
-    if (lab.clutter_text && typeof lab.clutter_text.connect === 'function' && !lab.clutter_text[HOOKED]) {
-      lab.clutter_text[HOOKED] = true;
-      const id = lab.clutter_text.connect('notify::text', () => {
+    const ct = lab && lab.clutter_text;
+    if (ct && !ct[HOOKED] && typeof ct.connect === 'function') {
+      ct[HOOKED] = true;
+      const id = ct.connect('notify::text', () => {
         try {
           _forcePlain(lab);
-          lab.set_text(_formatNow(settings.get_string('format-string')));
+          if (typeof lab.set_text === 'function')
+            lab.set_text(_formatNow(settings.get_string('format-string')));
         } catch (_) {}
       });
-      _textSignalIds.push([lab.clutter_text, id]);
+      _textSignalIds.push([ct, id]);
     }
   } catch (_) {}
 }
 
 function _updateAllNow() {
   let n = 0;
-  for (const lab of _collectClockLabels()) {
-    _applyTo(lab);
+  const labs = _collectClockLabels();
+  for (let i = 0; i < labs.length; i++) {
+    _applyTo(labs[i]);
     n++;
   }
-  debug(`tick — touched ${n} label(s)`);
+  debug('tick — touched ' + n + ' label(s)');
 }
 
 function _tickOnceAndReschedule() {
@@ -118,15 +126,19 @@ function _tickOnceAndReschedule() {
   const sec = Math.max(1, settings.get_int('update-interval'));
   _timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, sec, () => {
     _tickOnceAndReschedule();
-    return GLib.SOURCE_REMOVE;
+    return GLib.SOURCE_REMOVE; // one-shot, we reschedule manually
   });
 }
 
 function _restartTimer() {
-  if (_timeoutId) { GLib.source_remove(_timeoutId); _timeoutId = 0; }
+  if (_timeoutId) {
+    GLib.source_remove(_timeoutId);
+    _timeoutId = 0;
+  }
   _tickOnceAndReschedule();
 }
 
+/* GNOME entry points */
 function init() {
   settings = ExtensionUtils.getSettings('org.nick.numericclock');
 }
@@ -149,18 +161,18 @@ function disable() {
 
   if (_timeoutId) { GLib.source_remove(_timeoutId); _timeoutId = 0; }
 
-  for (const id of _settingsChangedIds) {
-    try { settings.disconnect(id); } catch (_) {}
+  for (let i = 0; i < _settingsChangedIds.length; i++) {
+    try { settings.disconnect(_settingsChangedIds[i]); } catch (_) {}
   }
   _settingsChangedIds = [];
 
-  if (_stageAddedId)   { try { global.stage.disconnect(_stageAddedId); } catch (_) {} _stageAddedId = 0; }
+  if (_stageAddedId)   { try { global.stage.disconnect(_stageAddedId); }   catch (_) {} _stageAddedId   = 0; }
   if (_stageRemovedId) { try { global.stage.disconnect(_stageRemovedId); } catch (_) {} _stageRemovedId = 0; }
 
-  for (const [actor, id] of _textSignalIds) {
-    try { actor.disconnect(id); } catch (_) {}
-    try { delete actor[HOOKED]; } catch (_) {}
+  for (let i = 0; i < _textSignalIds.length; i++) {
+    const pair = _textSignalIds[i];
+    try { pair[0].disconnect(pair[1]); } catch (_) {}
+    try { delete pair[0][HOOKED]; } catch (_) {}
   }
   _textSignalIds = [];
 }
-
