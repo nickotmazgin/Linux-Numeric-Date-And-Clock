@@ -8,5 +8,6 @@
   ],
   "url": "https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock",
   "uuid": "numeric-clock@nickotmazgin",
-  "version": 7
+  "version": 7,
+  "icon": "icon.png"
 }
