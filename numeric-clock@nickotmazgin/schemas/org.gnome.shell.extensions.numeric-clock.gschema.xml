@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="org.nick.numericclock" path="/org/nick/numericclock/">
+  <schema id="org.gnome.shell.extensions.numeric-clock" path="/org/gnome/shell/extensions/numeric-clock/">
     <key name="format-string" type="s">
       <default>'%A %d/%m/%Y %H:%M'</default>
       <summary>Clock format</summary>

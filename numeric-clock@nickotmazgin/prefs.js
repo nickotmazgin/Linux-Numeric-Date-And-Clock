@@ -1,15 +1,11 @@
+const ExtensionUtils = imports.misc.extensionUtils;
 /* prefs.js — GNOME 42–45, works with GTK3 or GTK4 */
 'use strict';
 const { Gio, Gtk } = imports.gi;
 
-const SCHEMA_ID = 'org.nick.numericclock';
 
 function getSettings() {
-  const src = Gio.SettingsSchemaSource.get_default();
-  const schema = src.lookup(SCHEMA_ID, true);
-  if (!schema)
-    throw new Error('Schema org.nick.numericclock not found. Did you run glib-compile-schemas?');
-  return new Gio.Settings({ settings_schema: schema });
+    return ExtensionUtils.getSettings();
 }
 
 /* GNOME calls this if present; keep it as a function (even if empty) */

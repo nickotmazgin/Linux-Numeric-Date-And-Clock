@@ -124,6 +124,7 @@ function _updateAllNow() {
 function _tickOnceAndReschedule() {
   _updateAllNow();
   const sec = Math.max(1, settings.get_int('update-interval'));
+  if (_timeoutId) { GLib.source_remove(_timeoutId); _timeoutId = 0; }
   _timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, sec, () => {
     _tickOnceAndReschedule();
     return GLib.SOURCE_REMOVE; // one-shot, we reschedule manually
@@ -139,12 +140,10 @@ function _restartTimer() {
 }
 
 /* GNOME entry points */
-function init() {
-  settings = ExtensionUtils.getSettings('org.nick.numericclock');
-}
+function init() {}
 
 function enable() {
-  debug('ENABLED');
+  settings = ExtensionUtils.getSettings();
 
   _settingsChangedIds = [];
   _settingsChangedIds.push(settings.connect('changed::format-string', _updateAllNow));
@@ -157,7 +156,6 @@ function enable() {
 }
 
 function disable() {
-  debug('DISABLED');
 
   if (_timeoutId) { GLib.source_remove(_timeoutId); _timeoutId = 0; }
 
@@ -175,4 +173,5 @@ function disable() {
     try { delete pair[0][HOOKED]; } catch (_) {}
   }
   _textSignalIds = [];
+  settings = null;
 }
