@@ -1,19 +1,13 @@
 
-> **Legacy build (GNOME 42–44). For GNOME 45+ see the [`main` branch](../../tree/main) and the E.G.O. page:  
-> https://extensions.gnome.org/extension/8566/numeric-clock/**
-| Branch | GNOME | Install |
-|---|---|---|
-| `main` | 45+ | E.G.O. (recommended) or 45+ ZIP |
-| `legacy/42-44` | 42–44 | Legacy ZIP (manual) |
-
 # Numeric Clock (GNOME Shell Extension)
 
-<img src="numeric-clock%40nickotmazgin/icon.png" width="96" align="right" alt="Numeric Clock icon">
-
 A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format (e.g., `DD/MM/YYYY HH:MM`).
-Works on **GNOME 45+** (Wayland & Xorg). Licensed under **MIT**.
+Works on **GNOME 42 → 45+** (Wayland & Xorg). Licensed under **MIT**.
 
 **UUID:** `numeric-clock@nickotmazgin`
+**E.G.O. page:** [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
+
+> Using GNOME **42–44**? See the [`legacy/42-44` branch](../../tree/legacy/42-44).
 
 ---
 
@@ -21,15 +15,14 @@ Works on **GNOME 45+** (Wayland & Xorg). Licensed under **MIT**.
 
 * **Install on GNOME Extensions (E.G.O.)**: [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
 * **Latest GitHub Release (ZIPs)**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
-* **Issues / feedback**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
-* **Questions / ideas (Discussions)**: https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions
+* **Issues**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
+* **Discussions**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
 
-[![Discussions](https://img.shields.io/badge/Discussions-join%20the%20chat-5965e0)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
 ---
 
 ## Screenshot
 
-![Numeric Clock — Top bar & Preferences](screenshots/numeric-clock_screenshot.png)
+![Numeric Clock — top bar & preferences](screenshots/numeric-clock_screenshot.png)
 
 ---
 
@@ -38,51 +31,50 @@ Works on **GNOME 45+** (Wayland & Xorg). Licensed under **MIT**.
 * Fully numeric date/time (you choose the `strftime` **format string**).
 * **Instant-apply** preferences — changes apply as you type.
 * Configurable **update interval** (seconds).
-* Plays nice with other panel clocks (keeps visible labels in sync).
-* Safe text rendering (forces plain text; no Pango markup).
+* Plays nice with other clocks (keeps visible labels in sync).
+* Safe text rendering (plain text; no Pango markup).
+* No network access, telemetry, or external services.
 
 ---
 
 ## Compatibility & builds
 
-| Build               | GNOME     | Schema ID                                  | Notes                                                  |
-| ------------------- | --------- | ------------------------------------------ | ------------------------------------------------------ |
-| **Main (v1.2.3)**   | **45+**   | `org.gnome.shell.extensions.numeric-clock` | Published on E.G.O.; icon included in `metadata.json`. |
-| **Legacy (v1.1.1)** | **42–44** | `org.nick.numericclock`                    | Manual ZIP for older shells (schemas pre-compiled).    |
+| Build (branch)              |     GNOME | Settings schema ID                         | E.G.O “Extension version” | Packaging notes                                                                         |
+| --------------------------- | --------: | ------------------------------------------ | ------------------------: | --------------------------------------------------------------------------------------- |
+| **Main** (`main`)           |   **45+** | `org.gnome.shell.extensions.numeric-clock` |                    **v7** | **Do not** include `schemas/gschemas.compiled`. Metadata includes `"icon": "icon.png"`. |
+| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` |                   **v12** | **Must** include `schemas/gschemas.compiled` inside the ZIP.                            |
 
-> Using GNOME **45 or newer?** Install from **E.G.O.** (recommended).
-> Using **42–44?** Use the **Legacy** ZIP from the releases page.
+> On the E.G.O. page you can pick **Shell version** (42/43/44/45) and the matching **Extension version** (v12 for 42–44, v7 for 45+) from the dropdowns.
 
 ---
 
 ## Install
 
-### A) From **extensions.gnome.org** (recommended for 45+)
+### A) From **extensions.gnome.org** (recommended)
 
-Open **Extensions** (or **Extension Manager**) → **Browse** → search **“Numeric Clock”** → toggle **On** → **Preferences** to configure.
-Direct link: [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
+1. Open [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
+2. In **Download**, set **Shell version** to your GNOME, then choose:
 
-### B) From a **GitHub release** (manual — 45+)
+   * **GNOME 45+ → Extension version v7**
+   * **GNOME 42–44 → Extension version v12**
+3. Click **Install** (with the browser integration), or download and install manually:
 
-Download the latest **45+ ZIP** (e.g., `numeric-clock@nickotmazgin-gnome45-v1.2.3.zip`) and install:
+### B) Manual install (ZIP)
 
 ```bash
+# 45+
 gnome-extensions install --force numeric-clock@nickotmazgin-gnome45-*.zip
+
+# 42–44 (legacy)
+gnome-extensions install --force numeric-clock@nickotmazgin-legacy-42-44-*.zip
+
+# Enable + open preferences
 gnome-extensions enable numeric-clock@nickotmazgin
 gnome-extensions prefs  numeric-clock@nickotmazgin
 ```
 
-### C) **Legacy GNOME 42–44** (manual)
-
-Download `numeric-clock@nickotmazgin-legacy-42-44.zip` and install:
-
-```bash
-gnome-extensions install --force numeric-clock@nickotmazgin-legacy-42-44.zip
-gnome-extensions enable numeric-clock@nickotmazgin
-gnome-extensions prefs  numeric-clock@nickotmazgin
-```
-
-*(The legacy ZIP already contains `schemas/gschemas.compiled` for 42–44.)*
+> **Note:** 45+ ZIPs **must not** contain `schemas/gschemas.compiled`.
+> 42–44 ZIPs **must** contain `schemas/gschemas.compiled`.
 
 ---
 
@@ -90,7 +82,7 @@ gnome-extensions prefs  numeric-clock@nickotmazgin
 
 Open **Preferences** and set:
 
-* **Format string** — `strftime` pattern.
+* **Format string** — any `strftime` pattern.
 * **Update interval (seconds)** — how often to refresh.
 
 Changes apply immediately as you type.
@@ -109,27 +101,34 @@ Examples:
 
 ## Troubleshooting
 
-See two clocks? Disable other clock extensions:
+**Clock missing or doubled?**
 
-```bash
-gnome-extensions list | grep -i clock
-gnome-extensions disable clock-override@gnomeshell.kryogenix.org || true
-```
+* List clock-like extensions and disable the extra one:
 
-Reset to defaults (45+ schema):
+  ```bash
+  gnome-extensions list | grep -Ei 'clock|date|time'
+  gnome-extensions disable <conflicting-extension-uuid>
+  ```
+* If the panel label doesn’t refresh:
+
+  * Make sure your **Update interval** is > 0.
+  * On **Xorg** you can press **Alt+F2**, type `r`, Enter (restart shell).
+    On **Wayland**, log out and back in.
+
+**Reset preferences (45+ schema):**
 
 ```bash
 gsettings reset-recursively org.gnome.shell.extensions.numeric-clock
 ```
 
-Manually set values (45+):
+**Check what’s installed / enabled:**
 
 ```bash
-gsettings set org.gnome.shell.extensions.numeric-clock format-string '%A %d/%m/%Y %H:%M'
-gsettings set org.gnome.shell.extensions.numeric-clock update-interval 60
+gnome-extensions info numeric-clock@nickotmazgin
+gnome-extensions list --enabled
 ```
 
-Logs:
+**Logs:**
 
 ```bash
 journalctl --user -b 0 -o cat | grep -i numeric-clock
@@ -139,47 +138,72 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 
 ## Packaging & releases (for maintainers)
 
-1. **Bump** the integer `"version"` in `numeric-clock@nickotmazgin/metadata.json` (this is what E.G.O. reads).
-2. Ensure repo URL and icon are set:
+**E.G.O. reads the integer `"version"` in `metadata.json`:**
 
-   ```json
-   "url": "https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock",
-   "icon": "icon.png"
-   ```
-3. **Build (45+)** from inside `numeric-clock@nickotmazgin/`:
+* **45+ build** → `"version": 7`
+* **42–44 build** → `"version": 12`
 
-   ```bash
-   rm -f schemas/gschemas.compiled
-   gnome-extensions pack . --force --out-dir ..
-   # Produces: ../numeric-clock@nickotmazgin.shell-extension.zip
-   ```
-4. **Legacy 42–44** (from the `legacy/42-44` branch): ensure `gschemas.compiled` is present inside the ZIP.
-5. Create a **GitHub Release** and upload the relevant ZIP(s).
-   On E.G.O., submit the **45+** build.
+**Common metadata fields:**
 
-> **Note:** Do **not** commit `schemas/gschemas.compiled` in the repo; it’s a build artifact.
+```json
+{
+  "uuid": "numeric-clock@nickotmazgin",
+  "name": "Numeric Clock",
+  "description": "Top-bar clock with a numeric format (DD/MM/YYYY 24-hour).",
+  "settings-schema": "org.gnome.shell.extensions.numeric-clock",
+  "url": "https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock"
+}
+```
+
+**45+ build (from `main`):**
+
+```bash
+cd numeric-clock@nickotmazgin
+rm -f schemas/gschemas.compiled                  # must NOT ship on 45+
+# ensure metadata has "icon": "icon.png"
+gnome-extensions pack . --force --out-dir ..
+# -> ../numeric-clock@nickotmazgin.shell-extension.zip
+```
+
+**Legacy 42–44 build (from `legacy/42-44`):**
+
+```bash
+cd numeric-clock@nickotmazgin
+glib-compile-schemas schemas                     # produce schemas/gschemas.compiled
+gnome-extensions pack . --force --out-dir ..
+# -> ../numeric-clock@nickotmazgin.shell-extension.zip
+```
+
+**Release flow**
+
+1. Upload the appropriate ZIP(s) to **GitHub Releases**.
+2. On **E.G.O.**, submit the **45+** update (v7) and keep **legacy v12** available via the dropdowns.
+
+> Do **not** commit `schemas/gschemas.compiled` to the repo; it’s a build artifact (only inside the legacy ZIP).
 
 ---
 
 ## Privacy
 
-No network access. The extension only formats and sets the top-bar label.
+No network access. Only local preferences are stored.
+
+---
 
 ## License
 
-MIT © Nick Otmazgin
+MIT © Nick Otmazgin — see [LICENSE](LICENSE).
+
+---
 
 ## Support
 
 If you enjoy the extension and want to support development:
 **PayPal:** [https://www.paypal.com/paypalme/nickotmazgin](https://www.paypal.com/paypalme/nickotmazgin)
 
-## Links
-
-* **Releases:** [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases)
-* **Issues:** [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
-* **Website (E.G.O. “Website” button):** [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock)
+---
 
 ## Contact
 
 [nickotmazgin.dev@gmail.com](mailto:nickotmazgin.dev@gmail.com)
+
+---
