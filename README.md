@@ -24,7 +24,7 @@ Works on **GNOME 42 → 47** (Wayland & Xorg). Licensed under **MIT**.
 
 ## Screenshot
 
-![Numeric Clock — top bar & preferences](screenshots/numeric-clock_screenshot.png)
+![Numeric Clock — top bar & preferences](screenshots/linux-numeric-date-clock-ss.png)
 
 ---
 
