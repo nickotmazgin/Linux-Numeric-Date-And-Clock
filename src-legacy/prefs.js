@@ -73,6 +73,33 @@ function buildPrefsWidget() {
     } catch (e) {}
   });
 
+  // ---- Only top bar toggle ----
+  const onlyLabel = new Gtk.Label({ label: _('Only override top bar DateMenu'), halign: Gtk.Align.START });
+  const onlySwitch = new Gtk.Switch({ active: settings.get_boolean('only-topbar'), halign: Gtk.Align.END });
+  onlySwitch.connect('notify::active', w => settings.set_boolean('only-topbar', w.active));
+
+  // ---- Smooth seconds toggle ----
+  const smoothLabel = new Gtk.Label({ label: _('Smooth tick (align to second)'), halign: Gtk.Align.START });
+  const smoothSwitch = new Gtk.Switch({ active: settings.get_boolean('smooth-second'), halign: Gtk.Align.END });
+  smoothSwitch.connect('notify::active', w => settings.set_boolean('smooth-second', w.active));
+
+  // ---- Presets ----
+  const presetsLabel = new Gtk.Label({ label: _('Presets'), halign: Gtk.Align.START });
+  const btnDefault = new Gtk.Button({ label: _('Default') });
+  const btnSeconds = new Gtk.Button({ label: _('Seconds') });
+  btnDefault.connect('clicked', () => {
+    settings.set_string('format-string', '%A %d/%m/%Y %H:%M');
+    if (typeof spin.set_value === 'function') spin.set_value(60);
+    settings.set_int('update-interval', 60);
+    refreshPreview();
+  });
+  btnSeconds.connect('clicked', () => {
+    settings.set_string('format-string', '%A %d/%m/%Y %H:%M:%S');
+    if (typeof spin.set_value === 'function') spin.set_value(1);
+    settings.set_int('update-interval', 1);
+    refreshPreview();
+  });
+
   // Layout
   grid.attach(fmtLabel, 0, 0, 1, 1);
   grid.attach(fmtEntry, 1, 0, 1, 1);
@@ -102,29 +129,3 @@ function buildPrefsWidget() {
   // Do NOT call show_all() (GTK3-only). Returning the widget is enough.
   return grid;
 }
-  // ---- Only top bar toggle ----
-  const onlyLabel = new Gtk.Label({ label: _('Only override top bar DateMenu'), halign: Gtk.Align.START });
-  const onlySwitch = new Gtk.Switch({ active: settings.get_boolean('only-topbar'), halign: Gtk.Align.END });
-  onlySwitch.connect('notify::active', w => settings.set_boolean('only-topbar', w.active));
-
-  // ---- Smooth seconds toggle ----
-  const smoothLabel = new Gtk.Label({ label: _('Smooth tick (align to second)'), halign: Gtk.Align.START });
-  const smoothSwitch = new Gtk.Switch({ active: settings.get_boolean('smooth-second'), halign: Gtk.Align.END });
-  smoothSwitch.connect('notify::active', w => settings.set_boolean('smooth-second', w.active));
-
-  // ---- Presets ----
-  const presetsLabel = new Gtk.Label({ label: _('Presets'), halign: Gtk.Align.START });
-  const btnDefault = new Gtk.Button({ label: _('Default') });
-  const btnSeconds = new Gtk.Button({ label: _('Seconds') });
-  btnDefault.connect('clicked', () => {
-    settings.set_string('format-string', '%A %d/%m/%Y %H:%M');
-    if (typeof spin.set_value === 'function') spin.set_value(60);
-    settings.set_int('update-interval', 60);
-    refreshPreview();
-  });
-  btnSeconds.connect('clicked', () => {
-    settings.set_string('format-string', '%A %d/%m/%Y %H:%M:%S');
-    if (typeof spin.set_value === 'function') spin.set_value(1);
-    settings.set_int('update-interval', 1);
-    refreshPreview();
-  });
