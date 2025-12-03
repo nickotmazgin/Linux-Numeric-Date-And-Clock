@@ -1,0 +1,5 @@
+* @nickotmazgin
+
+# Optional: restrict GitHub UI to require CODEOWNERS review on protected branches
+# Enable in repo settings: Branch protection -> Require review from Code Owners
+
