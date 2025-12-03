@@ -1,7 +1,7 @@
 const ExtensionUtils = imports.misc.extensionUtils;
 /* prefs.js — GNOME 42–45, works with GTK3 or GTK4 */
 'use strict';
-const { Gio, Gtk } = imports.gi;
+const { Gio, Gtk, GLib } = imports.gi;
 
 
 function getSettings() {
@@ -45,11 +45,41 @@ function buildPrefsWidget() {
   }
   spin.connect('value-changed', w => settings.set_int('update-interval', getSpinInt(w)));
 
+  // ---- Live preview ----
+  const prevLabel = new Gtk.Label({ label: 'Preview', halign: Gtk.Align.START });
+  const preview = new Gtk.Label({ halign: Gtk.Align.END, hexpand: true });
+  function formatNow(fmt) {
+    try { return GLib.DateTime.new_now_local().format(fmt); }
+    catch (e) { return GLib.DateTime.new_now_local().format('%d/%m/%Y %H:%M'); }
+  }
+  function refreshPreview() {
+    preview.set_label(formatNow(settings.get_string('format-string')));
+  }
+  refreshPreview();
+  settings.connect('changed::format-string', refreshPreview);
+
+  // ---- Reset button ----
+  const resetLabel = new Gtk.Label({ label: 'Reset to defaults', halign: Gtk.Align.START });
+  const resetBtn = new Gtk.Button({ label: 'Reset' });
+  resetBtn.connect('clicked', () => {
+    try {
+      settings.reset('format-string');
+      settings.reset('update-interval');
+      fmtEntry.set_text(settings.get_string('format-string'));
+      if (typeof spin.set_value === 'function') spin.set_value(settings.get_int('update-interval'));
+      refreshPreview();
+    } catch (e) {}
+  });
+
   // Layout
   grid.attach(fmtLabel, 0, 0, 1, 1);
   grid.attach(fmtEntry, 1, 0, 1, 1);
   grid.attach(intLabel, 0, 1, 1, 1);
   grid.attach(spin,     1, 1, 1, 1);
+  grid.attach(prevLabel, 0, 2, 1, 1);
+  grid.attach(preview,   1, 2, 1, 1);
+  grid.attach(resetLabel,0, 3, 1, 1);
+  grid.attach(resetBtn,  1, 3, 1, 1);
 
   // Do NOT call show_all() (GTK3-only). Returning the widget is enough.
   return grid;

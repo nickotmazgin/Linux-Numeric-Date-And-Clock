@@ -4,10 +4,12 @@
   "name": "Numeric Clock",
   "settings-schema": "org.gnome.shell.extensions.numeric-clock",
   "shell-version": [
-    "45"
+    "45",
+    "46",
+    "47"
   ],
   "url": "https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock",
   "uuid": "numeric-clock@nickotmazgin",
-  "version": 8,
+  "version": 14,
   "icon": "icon.png"
 }

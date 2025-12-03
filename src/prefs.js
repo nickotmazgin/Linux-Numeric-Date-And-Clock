@@ -2,6 +2,7 @@
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 export default class NumericClockPrefs extends ExtensionPreferences {
@@ -14,12 +15,27 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     const group = new Adw.PreferencesGroup({ title: 'Numeric Clock' });
 
     const rowFmt = new Adw.ActionRow({ title: 'Format string' });
-    const entry = new Gtk.Entry({ hexpand: true });
+    const entry = new Gtk.Entry({ hexpand: true, placeholder_text: '%A %d/%m/%Y %H:%M' });
     entry.text = settings.get_string('format-string');
     entry.connect('changed', w => settings.set_string('format-string', w.text));
     rowFmt.add_suffix(entry);
     rowFmt.activatable_widget = entry;
     group.add(rowFmt);
+
+    // Live preview
+    const rowPreview = new Adw.ActionRow({ title: 'Preview' });
+    const preview = new Gtk.Label({ hexpand: true, selectable: true, xalign: 1 });
+    function formatNow(fmt) {
+      try { return GLib.DateTime.new_now_local().format(fmt); }
+      catch (_) { return GLib.DateTime.new_now_local().format('%d/%m/%Y %H:%M'); }
+    }
+    function refreshPreview() {
+      preview.label = formatNow(settings.get_string('format-string'));
+    }
+    refreshPreview();
+    settings.connect('changed::format-string', refreshPreview);
+    rowPreview.add_suffix(preview);
+    group.add(rowPreview);
 
     const rowInt = new Adw.ActionRow({ title: 'Update interval (seconds)' });
     const adj = new Gtk.Adjustment({ lower: 1, upper: 60, step_increment: 1, page_increment: 5, value: settings.get_int('update-interval') });
@@ -31,6 +47,21 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     rowInt.add_suffix(spin);
     rowInt.activatable_widget = spin;
     group.add(rowInt);
+
+    // Reset button
+    const rowReset = new Adw.ActionRow({ title: 'Reset to defaults' });
+    const btnReset = new Gtk.Button({ label: 'Reset' });
+    btnReset.connect('clicked', () => {
+      try {
+        settings.reset('format-string');
+        settings.reset('update-interval');
+        entry.text = settings.get_string('format-string');
+        if (typeof spin.set_value === 'function') spin.set_value(settings.get_int('update-interval'));
+        refreshPreview();
+      } catch (_) {}
+    });
+    rowReset.add_suffix(btnReset);
+    group.add(rowReset);
 
     page.add(group);
     window.add(page);

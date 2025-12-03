@@ -2,7 +2,7 @@
 # Numeric Clock (GNOME Shell Extension)
 
 A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format (e.g., `DD/MM/YYYY HH:MM`).
-Works on **GNOME 42 → 45+** (Wayland & Xorg). Licensed under **MIT**.
+Works on **GNOME 42 → 47** (Wayland & Xorg). Licensed under **MIT**.
 
 **UUID:** `numeric-clock@nickotmazgin`
 **E.G.O. page:** [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
@@ -41,10 +41,10 @@ Works on **GNOME 42 → 45+** (Wayland & Xorg). Licensed under **MIT**.
 
 | Build (branch)              |     GNOME | Settings schema ID                         | E.G.O “Extension version” | Packaging notes                                                                         |
 | --------------------------- | --------: | ------------------------------------------ | ------------------------: | --------------------------------------------------------------------------------------- |
-| **Main** (`main`)           |   **45+** | `org.gnome.shell.extensions.numeric-clock` |                    **v7** | **Do not** include `schemas/gschemas.compiled`. Metadata includes `"icon": "icon.png"`. |
-| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` |                   **v12** | **Must** include `schemas/gschemas.compiled` inside the ZIP.                            |
+| **Main** (`main`)           | **45–47** | `org.gnome.shell.extensions.numeric-clock` |                   **v14** | **Do not** include `schemas/gschemas.compiled`. Metadata includes `"icon": "icon.png"`. |
+| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` |                   **v13** | **Must** include `schemas/gschemas.compiled` inside the ZIP.                            |
 
-> On the E.G.O. page you can pick **Shell version** (42/43/44/45) and the matching **Extension version** (v12 for 42–44, v7 for 45+) from the dropdowns.
+> On the E.G.O. page you can pick **Shell version** (42/43/44/45/46/47) and the matching **Extension version** (v13 for 42–44, v14 for 45–47) from the dropdowns.
 
 ---
 
@@ -55,18 +55,18 @@ Works on **GNOME 42 → 45+** (Wayland & Xorg). Licensed under **MIT**.
 1. Open [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
 2. In **Download**, set **Shell version** to your GNOME, then choose:
 
-   * **GNOME 45+ → Extension version v7**
-   * **GNOME 42–44 → Extension version v12**
+   - **GNOME 45–47 → Extension version v14**
+   - **GNOME 42–44 → Extension version v13**
 3. Click **Install** (with the browser integration), or download and install manually:
 
 ### B) Manual install (ZIP)
 
 ```bash
-# 45+
-gnome-extensions install --force numeric-clock@nickotmazgin-gnome45-*.zip
+# 45–47
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v14.shell-extension.zip
 
 # 42–44 (legacy)
-gnome-extensions install --force numeric-clock@nickotmazgin-legacy-42-44-*.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v13.shell-extension.zip
 
 # Enable + open preferences
 gnome-extensions enable numeric-clock@nickotmazgin
@@ -140,8 +140,8 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 
 **E.G.O. reads the integer `"version"` in `metadata.json`:**
 
-* **45+ build** → `"version": 7`
-* **42–44 build** → `"version": 12`
+- **45–47 build** → `"version": 14`
+- **42–44 build** → `"version": 13`
 
 **Common metadata fields:**
 
@@ -155,29 +155,24 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 }
 ```
 
-**45+ build (from `main`):**
+**45–47 build (from `main`):**
 
 ```bash
-cd numeric-clock@nickotmazgin
-rm -f schemas/gschemas.compiled                  # must NOT ship on 45+
-# ensure metadata has "icon": "icon.png"
-gnome-extensions pack . --force --out-dir ..
-# -> ../numeric-clock@nickotmazgin.shell-extension.zip
+./tools/build.sh
+# -> dist/numeric-clock@nickotmazgin.v14.shell-extension.zip
 ```
 
 **Legacy 42–44 build (from `legacy/42-44`):**
 
 ```bash
-cd numeric-clock@nickotmazgin
-glib-compile-schemas schemas                     # produce schemas/gschemas.compiled
-gnome-extensions pack . --force --out-dir ..
-# -> ../numeric-clock@nickotmazgin.shell-extension.zip
+./tools/build.sh
+# -> dist/numeric-clock@nickotmazgin.v13.shell-extension.zip
 ```
 
 **Release flow**
 
 1. Upload the appropriate ZIP(s) to **GitHub Releases**.
-2. On **E.G.O.**, submit the **45+** update (v7) and keep **legacy v12** available via the dropdowns.
+2. On **E.G.O.**, submit the **45–47** update (v14) and keep **legacy v13** available via the dropdowns.
 
 > Do **not** commit `schemas/gschemas.compiled` to the repo; it’s a build artifact (only inside the legacy ZIP).
 
