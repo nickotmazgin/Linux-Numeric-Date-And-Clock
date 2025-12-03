@@ -12,6 +12,7 @@ function debug(msg) { if (DEBUG) log(`[numeric-clock] ${msg}`); }
 
 let settings = null;
 let _timeoutId = 0;
+let _msTimeoutId = 0;
 let _settingsChangedIds = [];
 let _stageAddedId = 0;
 let _stageRemovedId = 0;
@@ -61,6 +62,11 @@ function _collectClockLabels() {
     if (dm._clock        instanceof St.Label) set.add(dm._clock);
     if (dm._time         instanceof St.Label) set.add(dm._time);
   }
+
+  try {
+    if (settings && settings.get_boolean('only-topbar'))
+      return Array.from(set);
+  } catch (_) {}
 
   // Any label that looks like a clock (covers Zorin taskbar etc.)
   const all = _allStageLabels();
@@ -136,7 +142,22 @@ function _restartTimer() {
     GLib.source_remove(_timeoutId);
     _timeoutId = 0;
   }
-  _tickOnceAndReschedule();
+  if (_msTimeoutId) { GLib.source_remove(_msTimeoutId); _msTimeoutId = 0; }
+  try {
+    const sec = Math.max(1, settings.get_int('update-interval'));
+    const smooth = !!settings.get_boolean('smooth-second');
+    if (smooth && sec === 1) {
+      const now = GLib.DateTime.new_now_local();
+      const delayMs = 1000 - Math.floor(now.get_microsecond() / 1000);
+      _msTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, delayMs, () => {
+        _tickOnceAndReschedule();
+        _msTimeoutId = 0;
+        return GLib.SOURCE_REMOVE;
+      });
+    } else {
+      _tickOnceAndReschedule();
+    }
+  } catch (_) { _tickOnceAndReschedule(); }
 }
 
 /* GNOME entry points */
@@ -158,6 +179,7 @@ function enable() {
 function disable() {
 
   if (_timeoutId) { GLib.source_remove(_timeoutId); _timeoutId = 0; }
+  if (_msTimeoutId) { GLib.source_remove(_msTimeoutId); _msTimeoutId = 0; }
 
   for (let i = 0; i < _settingsChangedIds.length; i++) {
     try { settings.disconnect(_settingsChangedIds[i]); } catch (_) {}

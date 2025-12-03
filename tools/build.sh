@@ -12,9 +12,8 @@ LEGACY_DIR="$ROOT_DIR/src-legacy"
 
 mkdir -p "$DIST_DIR"
 
-need() { command -v "$1" >/dev/null 2>&1 || { echo "Missing required command: $1" >&2; exit 1; }; }
-need gnome-extensions
-need glib-compile-schemas
+have() { command -v "$1" >/dev/null 2>&1; }
+have glib-compile-schemas || { echo "Missing required command: glib-compile-schemas" >&2; exit 1; }
 
 meta_val() {
   # jq-less JSON field extractor for flat string/int fields in metadata.json
@@ -50,15 +49,16 @@ pack_dir() {
     rm -f "$tmpdir/schemas/gschemas.compiled" 2>/dev/null || true
   fi
 
-  # Pack
-  local out
-  out=$(gnome-extensions pack "$tmpdir" --force --out-dir "$dist")
-  # gnome-extensions outputs a message like: Created /path/uuid.shell-extension.zip
-  local basezip
-  basezip=$(echo "$out" | sed -n -E 's/^Created[[:space:]]+(.+)$/\1/p')
-  if [[ -z "$basezip" || ! -f "$basezip" ]]; then
-    # Fallback: guess by UUID
-    basezip="$dist/${uuid}.shell-extension.zip"
+  # Pack: prefer gnome-extensions, else plain zip
+  local basezip="$dist/${uuid}.shell-extension.zip"
+  rm -f "$basezip"
+  if have gnome-extensions; then
+    local out
+    out=$(gnome-extensions pack "$tmpdir" --force --out-dir "$dist")
+    basezip=$(echo "$out" | sed -n -E 's/^Created[[:space:]]+(.+)$/\1/p')
+    [[ -n "$basezip" && -f "$basezip" ]] || basezip="$dist/${uuid}.shell-extension.zip"
+  else
+    (cd "$tmpdir" && zip -qr "$basezip" .)
   fi
 
   local dest="$dist/${uuid}.v${version}.shell-extension.zip"

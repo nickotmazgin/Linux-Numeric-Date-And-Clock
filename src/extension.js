@@ -40,6 +40,7 @@ export default class NumericClockExtension extends Extension {
     super(uuid);
     this._settings = null;
     this._timeoutId = 0;
+    this._msTimeoutId = 0;
     this._stageAddedId = 0;
     this._stageRemovedId = 0;
     this._settingsChangedIds = [];
@@ -54,6 +55,10 @@ export default class NumericClockExtension extends Extension {
       if (dm._clock        instanceof St.Label) set.add(dm._clock);
       if (dm._time         instanceof St.Label) set.add(dm._time);
     }
+    try {
+      if (this._settings && this._settings.get_boolean('only-topbar'))
+        return Array.from(set);
+    } catch {}
     for (const lab of allStageLabels()) {
       const cls  = (typeof lab.get_style_class_name === 'function' ? lab.get_style_class_name() : '') || '';
       const name = (typeof lab.get_name === 'function' ? lab.get_name() : '') || '';
@@ -102,12 +107,31 @@ export default class NumericClockExtension extends Extension {
       GLib.source_remove(this._timeoutId);
       this._timeoutId = 0;
     }
+    if (this._msTimeoutId) {
+      GLib.source_remove(this._msTimeoutId);
+      this._msTimeoutId = 0;
+    }
     const sec = Math.max(1, this._settings.get_int('update-interval'));
     this._updateAllNow();
-    this._timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, sec, () => {
-      this._updateAllNow();
-      return GLib.SOURCE_CONTINUE;
-    });
+    const smooth = !!this._settings.get_boolean('smooth-second');
+    if (smooth && sec === 1) {
+      const now = GLib.DateTime.new_now_local();
+      const delayMs = 1000 - Math.floor(now.get_microsecond() / 1000);
+      this._msTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, delayMs, () => {
+        this._updateAllNow();
+        this._timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, sec, () => {
+          this._updateAllNow();
+          return GLib.SOURCE_CONTINUE;
+        });
+        this._msTimeoutId = 0;
+        return GLib.SOURCE_REMOVE;
+      });
+    } else {
+      this._timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, sec, () => {
+        this._updateAllNow();
+        return GLib.SOURCE_CONTINUE;
+      });
+    }
   }
 
   enable() {
@@ -125,6 +149,8 @@ export default class NumericClockExtension extends Extension {
   disable() {
     if (this._timeoutId) GLib.source_remove(this._timeoutId);
     this._timeoutId = 0;
+    if (this._msTimeoutId) GLib.source_remove(this._msTimeoutId);
+    this._msTimeoutId = 0;
 
     for (const id of this._settingsChangedIds) {
       try { this._settings.disconnect(id); } catch {}

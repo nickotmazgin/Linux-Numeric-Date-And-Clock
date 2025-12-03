@@ -1,0 +1,36 @@
+name: Build and attach extension zips
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip libglib2.0-bin
+
+      - name: Build zips
+        run: |
+          chmod +x tools/build.sh
+          ./tools/build.sh
+
+      - name: Validate zips
+        run: |
+          chmod +x tools/validate.sh
+          ./tools/validate.sh
+
+      - name: Upload release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF##*/}"
+          gh release upload "$TAG" dist/*.zip --clobber
+

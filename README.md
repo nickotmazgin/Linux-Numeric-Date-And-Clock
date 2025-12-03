@@ -4,6 +4,8 @@
 A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format (e.g., `DD/MM/YYYY HH:MM`).
 Works on **GNOME 42 → 47** (Wayland & Xorg). Licensed under **MIT**.
 
+![i18n](https://img.shields.io/badge/i18n-enabled-blue)
+
 **UUID:** `numeric-clock@nickotmazgin`
 **E.G.O. page:** [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
 
@@ -41,10 +43,10 @@ Works on **GNOME 42 → 47** (Wayland & Xorg). Licensed under **MIT**.
 
 | Build (branch)              |     GNOME | Settings schema ID                         | E.G.O “Extension version” | Packaging notes                                                                         |
 | --------------------------- | --------: | ------------------------------------------ | ------------------------: | --------------------------------------------------------------------------------------- |
-| **Main** (`main`)           | **45–47** | `org.gnome.shell.extensions.numeric-clock` |                   **v14** | **Do not** include `schemas/gschemas.compiled`. Metadata includes `"icon": "icon.png"`. |
-| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` |                   **v13** | **Must** include `schemas/gschemas.compiled` inside the ZIP.                            |
+| **Main** (`main`)           | **45–47** | `org.gnome.shell.extensions.numeric-clock` |                   **v15** | **Do not** include `schemas/gschemas.compiled`. Metadata includes `"icon": "icon.png"`. |
+| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` |                   **v14** | **Must** include `schemas/gschemas.compiled` inside the ZIP.                            |
 
-> On the E.G.O. page you can pick **Shell version** (42/43/44/45/46/47) and the matching **Extension version** (v13 for 42–44, v14 for 45–47) from the dropdowns.
+> On the E.G.O. page you can pick **Shell version** (42/43/44/45/46/47) and the matching **Extension version** (v14 for 42–44, v15 for 45–47) from the dropdowns.
 
 ---
 
@@ -55,18 +57,18 @@ Works on **GNOME 42 → 47** (Wayland & Xorg). Licensed under **MIT**.
 1. Open [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
 2. In **Download**, set **Shell version** to your GNOME, then choose:
 
-   - **GNOME 45–47 → Extension version v14**
-   - **GNOME 42–44 → Extension version v13**
+   - **GNOME 45–47 → Extension version v15**
+   - **GNOME 42–44 → Extension version v14**
 3. Click **Install** (with the browser integration), or download and install manually:
 
 ### B) Manual install (ZIP)
 
 ```bash
 # 45–47
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v14.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v15.shell-extension.zip
 
 # 42–44 (legacy)
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v13.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v14.shell-extension.zip
 
 # Enable + open preferences
 gnome-extensions enable numeric-clock@nickotmazgin
@@ -140,8 +142,8 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 
 **E.G.O. reads the integer `"version"` in `metadata.json`:**
 
-- **45–47 build** → `"version": 14`
-- **42–44 build** → `"version": 13`
+- **45–47 build** → `"version": 15`
+- **42–44 build** → `"version": 14`
 
 **Common metadata fields:**
 
@@ -159,14 +161,14 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 
 ```bash
 ./tools/build.sh
-# -> dist/numeric-clock@nickotmazgin.v14.shell-extension.zip
+# -> dist/numeric-clock@nickotmazgin.v15.shell-extension.zip
 ```
 
 **Legacy 42–44 build (from `legacy/42-44`):**
 
 ```bash
 ./tools/build.sh
-# -> dist/numeric-clock@nickotmazgin.v13.shell-extension.zip
+# -> dist/numeric-clock@nickotmazgin.v14.shell-extension.zip
 ```
 
 **Release flow**
