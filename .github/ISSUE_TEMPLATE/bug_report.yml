@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a problem with Numeric Clock
+labels: [bug]
+body:
+  - type: textarea
+    id: desc
+    attributes:
+      label: Description
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: input
+    id: shell
+    attributes:
+      label: GNOME Shell version
+      placeholder: e.g., 45.4 (Wayland)
+    validations:
+      required: true
+  - type: dropdown
+    id: build
+    attributes:
+      label: Build
+      options:
+        - 45–47 (ESM)
+        - 42–44 (legacy)
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. …
+        2. …
+        3. …
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Output of `journalctl --user -b 0 -o cat | grep -i numeric-clock`
+      render: shell

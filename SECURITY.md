@@ -7,8 +7,8 @@ We maintain security fixes for the currently released builds of Numeric Clock:
 
 | Extension branch | GNOME Shell | Version line | Status              |
 | ---------------- | ----------- | ------------ | ------------------- |
-| `main`           | 45+         | **1.2.x**    | Actively supported  |
-| `legacy/42-44`   | 42–44       | **1.1.x**    | Critical fixes only |
+| `main`           | 45–47       | **v17.x**    | Actively supported  |
+| `legacy/42-44`   | 42–44       | **v16.x**    | Critical fixes only |
 
 If you’re on an older line, please upgrade to a supported version.
 
