@@ -105,7 +105,19 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     rowReset.add_suffix(btnReset);
     group.add(rowReset);
 
+    // Support group
+    const support = new Adw.PreferencesGroup({ title: _('Support') });
+    const rowDonate = new Adw.ActionRow({ title: _('Donate via PayPal') });
+    const btnDonate = new Gtk.Button({ label: _('Donate') });
+    btnDonate.connect('clicked', () => {
+      try { Gio.AppInfo.launch_default_for_uri('https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW', null); } catch {}
+    });
+    rowDonate.add_suffix(btnDonate);
+    rowDonate.activatable_widget = btnDonate;
+    support.add(rowDonate);
+
     page.add(group);
+    page.add(support);
     window.add(page);
   }
 }

@@ -195,7 +195,7 @@ MIT © Nick Otmazgin — see [LICENSE](LICENSE).
 ## Support
 
 If you enjoy the extension and want to support development:
-**PayPal:** [https://www.paypal.com/paypalme/nickotmazgin](https://www.paypal.com/paypalme/nickotmazgin)
+**PayPal:** https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW
 
 ---
 

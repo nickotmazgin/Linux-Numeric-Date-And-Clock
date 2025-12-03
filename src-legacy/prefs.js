@@ -90,6 +90,15 @@ function buildPrefsWidget() {
   grid.attach(btnDefault, 1,6,1,1);
   grid.attach(btnSeconds, 1,7,1,1);
 
+  // ---- Support / Donate ----
+  const supportLabel = new Gtk.Label({ label: _('Support'), halign: Gtk.Align.START });
+  const donateBtn = new Gtk.Button({ label: _('Donate via PayPal') });
+  donateBtn.connect('clicked', () => {
+    try { Gio.AppInfo.launch_default_for_uri('https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW', null); } catch (_) {}
+  });
+  grid.attach(supportLabel, 0, 8, 1, 1);
+  grid.attach(donateBtn,   1, 8, 1, 1);
+
   // Do NOT call show_all() (GTK3-only). Returning the widget is enough.
   return grid;
 }
