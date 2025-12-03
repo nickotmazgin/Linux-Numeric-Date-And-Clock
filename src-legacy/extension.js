@@ -63,10 +63,8 @@ function _collectClockLabels() {
     if (dm._time         instanceof St.Label) set.add(dm._time);
   }
 
-  try {
-    if (settings && settings.get_boolean('only-topbar'))
-      return Array.from(set);
-  } catch (_) {}
+  if (settings && settings.get_boolean('only-topbar'))
+    return Array.from(set);
 
   // Any label that looks like a clock (covers Zorin taskbar etc.)
   const all = _allStageLabels();

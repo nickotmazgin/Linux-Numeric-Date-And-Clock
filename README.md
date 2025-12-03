@@ -44,7 +44,7 @@ Works on **GNOME 42 → 47** (Wayland & Xorg). Licensed under **MIT**.
 | Build (branch)              |     GNOME | Settings schema ID                         | E.G.O “Extension version” | Packaging notes                                                                         |
 | --------------------------- | --------: | ------------------------------------------ | ------------------------: | --------------------------------------------------------------------------------------- |
 | **Main** (`main`)           | **45–47** | `org.gnome.shell.extensions.numeric-clock` |                   **v17** | **Do not** include `schemas/gschemas.compiled`. Metadata omits `icon`. |
-| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` |                   **v14** | **Must** include `schemas/gschemas.compiled` inside the ZIP.                            |
+| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` |                   **v16** | **Must** include `schemas/gschemas.compiled` inside the ZIP.                            |
 
 > On the E.G.O. page you can pick **Shell version** (42/43/44/45/46/47) and the matching **Extension version** (v14 for 42–44, v15 for 45–47) from the dropdowns.
 
@@ -143,7 +143,7 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 **E.G.O. reads the integer `"version"` in `metadata.json`:**
 
 - **45–47 build** → `"version": 17`
-- **42–44 build** → `"version": 14`
+- **42–44 build** → `"version": 16`
 
 **Common metadata fields:**
 
