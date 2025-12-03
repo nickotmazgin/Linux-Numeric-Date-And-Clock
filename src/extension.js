@@ -55,10 +55,8 @@ export default class NumericClockExtension extends Extension {
       if (dm._clock        instanceof St.Label) set.add(dm._clock);
       if (dm._time         instanceof St.Label) set.add(dm._time);
     }
-    try {
-      if (this._settings && this._settings.get_boolean('only-topbar'))
-        return Array.from(set);
-    } catch {}
+    if (this._settings && this._settings.get_boolean('only-topbar'))
+      return Array.from(set);
     for (const lab of allStageLabels()) {
       const cls  = (typeof lab.get_style_class_name === 'function' ? lab.get_style_class_name() : '') || '';
       const name = (typeof lab.get_name === 'function' ? lab.get_name() : '') || '';
