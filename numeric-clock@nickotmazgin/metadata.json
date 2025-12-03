@@ -10,5 +10,6 @@
   ],
   "url": "https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock",
   "uuid": "numeric-clock@nickotmazgin",
-  "version": 13
+  "version": 14,
+  "gettext-domain": "numeric-clock"
 }

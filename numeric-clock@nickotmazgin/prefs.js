@@ -2,6 +2,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 /* prefs.js — GNOME 42–45, works with GTK3 or GTK4 */
 'use strict';
 const { Gio, Gtk, GLib } = imports.gi;
+const Gettext = imports.gettext;
+const _ = Gettext.domain('numeric-clock').gettext;
 
 
 function getSettings() {
@@ -23,15 +25,15 @@ function buildPrefsWidget() {
   });
 
   // ---- Format string ----
-  const fmtLabel = new Gtk.Label({ label: 'Format string', halign: Gtk.Align.START });
+  const fmtLabel = new Gtk.Label({ label: _('Format string'), halign: Gtk.Align.START });
   const fmtEntry = new Gtk.Entry({ hexpand: true });
   fmtEntry.set_text(settings.get_string('format-string'));
   fmtEntry.connect('changed', w => settings.set_string('format-string', w.get_text()));
 
   // ---- Update interval ----
-  const intLabel = new Gtk.Label({ label: 'Update interval (seconds)', halign: Gtk.Align.START });
+  const intLabel = new Gtk.Label({ label: _('Update interval (seconds)'), halign: Gtk.Align.START });
   const adj = new Gtk.Adjustment({
-    lower: 1, upper: 60, step_increment: 1, page_increment: 5,
+    lower: 1, upper: 300, step_increment: 1, page_increment: 5,
     value: settings.get_int('update-interval'),
   });
   const spin = new Gtk.SpinButton({ adjustment: adj });
@@ -46,7 +48,7 @@ function buildPrefsWidget() {
   spin.connect('value-changed', w => settings.set_int('update-interval', getSpinInt(w)));
 
   // ---- Live preview ----
-  const prevLabel = new Gtk.Label({ label: 'Preview', halign: Gtk.Align.START });
+  const prevLabel = new Gtk.Label({ label: _('Preview'), halign: Gtk.Align.START });
   const preview = new Gtk.Label({ halign: Gtk.Align.END, hexpand: true });
   function formatNow(fmt) {
     try { return GLib.DateTime.new_now_local().format(fmt); }
@@ -59,8 +61,8 @@ function buildPrefsWidget() {
   settings.connect('changed::format-string', refreshPreview);
 
   // ---- Reset button ----
-  const resetLabel = new Gtk.Label({ label: 'Reset to defaults', halign: Gtk.Align.START });
-  const resetBtn = new Gtk.Button({ label: 'Reset' });
+  const resetLabel = new Gtk.Label({ label: _('Reset to defaults'), halign: Gtk.Align.START });
+  const resetBtn = new Gtk.Button({ label: _('Reset') });
   resetBtn.connect('clicked', () => {
     try {
       settings.reset('format-string');
@@ -69,6 +71,33 @@ function buildPrefsWidget() {
       if (typeof spin.set_value === 'function') spin.set_value(settings.get_int('update-interval'));
       refreshPreview();
     } catch (_) {}
+  });
+
+  // ---- Only top bar toggle ----
+  const onlyLabel = new Gtk.Label({ label: _('Only override top bar DateMenu'), halign: Gtk.Align.START });
+  const onlySwitch = new Gtk.Switch({ active: settings.get_boolean('only-topbar'), halign: Gtk.Align.END });
+  onlySwitch.connect('notify::active', w => settings.set_boolean('only-topbar', w.active));
+
+  // ---- Smooth seconds toggle ----
+  const smoothLabel = new Gtk.Label({ label: _('Smooth tick (align to second)'), halign: Gtk.Align.START });
+  const smoothSwitch = new Gtk.Switch({ active: settings.get_boolean('smooth-second'), halign: Gtk.Align.END });
+  smoothSwitch.connect('notify::active', w => settings.set_boolean('smooth-second', w.active));
+
+  // ---- Presets ----
+  const presetsLabel = new Gtk.Label({ label: _('Presets'), halign: Gtk.Align.START });
+  const btnDefault = new Gtk.Button({ label: _('Default') });
+  const btnSeconds = new Gtk.Button({ label: _('Seconds') });
+  btnDefault.connect('clicked', () => {
+    settings.set_string('format-string', '%A %d/%m/%Y %H:%M');
+    if (typeof spin.set_value === 'function') spin.set_value(60);
+    settings.set_int('update-interval', 60);
+    refreshPreview();
+  });
+  btnSeconds.connect('clicked', () => {
+    settings.set_string('format-string', '%A %d/%m/%Y %H:%M:%S');
+    if (typeof spin.set_value === 'function') spin.set_value(1);
+    settings.set_int('update-interval', 1);
+    refreshPreview();
   });
 
   // Layout
@@ -80,6 +109,13 @@ function buildPrefsWidget() {
   grid.attach(preview,   1, 2, 1, 1);
   grid.attach(resetLabel,0, 3, 1, 1);
   grid.attach(resetBtn,  1, 3, 1, 1);
+  grid.attach(onlyLabel, 0, 4, 1, 1);
+  grid.attach(onlySwitch,1, 4, 1, 1);
+  grid.attach(smoothLabel,0,5,1,1);
+  grid.attach(smoothSwitch,1,5,1,1);
+  grid.attach(presetsLabel,0,6,1,1);
+  grid.attach(btnDefault, 1,6,1,1);
+  grid.attach(btnSeconds, 1,7,1,1);
 
   // Do NOT call show_all() (GTK3-only). Returning the widget is enough.
   return grid;

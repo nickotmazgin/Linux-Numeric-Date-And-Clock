@@ -10,6 +10,17 @@
       <default>60</default>
       <summary>Update interval (seconds)</summary>
       <description>How often to refresh the label.</description>
+      <range min="1" max="300"/>
+    </key>
+    <key name="only-topbar" type="b">
+      <default>false</default>
+      <summary>Only override top bar DateMenu</summary>
+      <description>If true, only modify the GNOME top bar DateMenu label, leaving other panels/taskbars untouched.</description>
+    </key>
+    <key name="smooth-second" type="b">
+      <default>false</default>
+      <summary>Smooth tick alignment</summary>
+      <description>Align the first update to the next second boundary when the interval is 1s.</description>
     </key>
   </schema>
 </schemalist>
