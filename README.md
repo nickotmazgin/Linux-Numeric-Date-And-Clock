@@ -7,7 +7,6 @@ Works on **GNOME 42 → 47** (Wayland & Xorg). Licensed under **MIT**.
 ![i18n](https://img.shields.io/badge/i18n-enabled-blue)
 
 **UUID:** `numeric-clock@nickotmazgin`
-**E.G.O. page:** [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
 
 > Using GNOME **42–44**? See the [`legacy/42-44` branch](../../tree/legacy/42-44).
 
@@ -15,7 +14,6 @@ Works on **GNOME 42 → 47** (Wayland & Xorg). Licensed under **MIT**.
 
 ## Quick links
 
-* **Install on GNOME Extensions (E.G.O.)**: [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
 * **Latest GitHub Release (ZIPs)**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
 * **Issues**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
 * **Discussions**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
@@ -41,27 +39,16 @@ Works on **GNOME 42 → 47** (Wayland & Xorg). Licensed under **MIT**.
 
 ## Compatibility & builds
 
-| Build (branch)              |     GNOME | Settings schema ID                         | E.G.O “Extension version” | Packaging notes                                                                         |
-| --------------------------- | --------: | ------------------------------------------ | ------------------------: | --------------------------------------------------------------------------------------- |
-| **Main** (`main`)           | **45–47** | `org.gnome.shell.extensions.numeric-clock` |                   **v17** | **Do not** include `schemas/gschemas.compiled`. Metadata omits `icon`. |
-| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` |                   **v18** | **Must** include `schemas/gschemas.compiled` inside the ZIP.                            |
-
-> On the E.G.O. page you can pick **Shell version** (42/43/44/45/46/47) and the matching **Extension version** (v14 for 42–44, v15 for 45–47) from the dropdowns.
+| Build (branch)              |     GNOME | Settings schema ID                         | Packaging notes                                               |
+| --------------------------- | --------: | ------------------------------------------ | ------------------------------------------------------------- |
+| **Main** (`main`)           | **45–47** | `org.gnome.shell.extensions.numeric-clock` | Do not include `schemas/gschemas.compiled`. Metadata omits `icon`. |
+| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` | Must include `schemas/gschemas.compiled` inside the ZIP.      |
 
 ---
 
 ## Install
 
-### A) From **extensions.gnome.org** (recommended)
-
-1. Open [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
-2. In **Download**, set **Shell version** to your GNOME, then choose:
-
-   - **GNOME 45–47 → Extension version v15**
-   - **GNOME 42–44 → Extension version v14**
-3. Click **Install** (with the browser integration), or download and install manually:
-
-### B) Manual install (ZIP)
+### Manual install (ZIP)
 
 ```bash
 # 45–47
@@ -140,11 +127,6 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 
 ## Packaging & releases (for maintainers)
 
-**E.G.O. reads the integer `"version"` in `metadata.json`:**
-
-- **45–47 build** → `"version": 17`
-- **42–44 build** → `"version": 18`
-
 **Common metadata fields:**
 
 ```json
@@ -174,7 +156,6 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 **Release flow**
 
 1. Upload the appropriate ZIP(s) to **GitHub Releases**.
-2. On **E.G.O.**, submit the **45–47** update (v14) and keep **legacy v13** available via the dropdowns.
 
 > Do **not** commit `schemas/gschemas.compiled` to the repo; it’s a build artifact (only inside the legacy ZIP).
 
