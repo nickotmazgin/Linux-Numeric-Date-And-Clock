@@ -5,7 +5,6 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 Works on **GNOME 42 → 45+** (Wayland & Xorg). Licensed under **MIT**.
 
 **UUID:** `numeric-clock@nickotmazgin`
-**E.G.O. page:** [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
 
 > Using GNOME **42–44**? See the [`legacy/42-44` branch](../../tree/legacy/42-44).
 
@@ -13,7 +12,6 @@ Works on **GNOME 42 → 45+** (Wayland & Xorg). Licensed under **MIT**.
 
 ## Quick links
 
-* **Install on GNOME Extensions (E.G.O.)**: [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
 * **Latest GitHub Release (ZIPs)**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
 * **Issues**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
 * **Discussions**: [https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
@@ -39,27 +37,16 @@ Works on **GNOME 42 → 45+** (Wayland & Xorg). Licensed under **MIT**.
 
 ## Compatibility & builds
 
-| Build (branch)              |     GNOME | Settings schema ID                         | E.G.O “Extension version” | Packaging notes                                                                         |
-| --------------------------- | --------: | ------------------------------------------ | ------------------------: | --------------------------------------------------------------------------------------- |
-| **Main** (`main`)           |   **45+** | `org.gnome.shell.extensions.numeric-clock` |                    **v7** | **Do not** include `schemas/gschemas.compiled`. Metadata includes `"icon": "icon.png"`. |
-| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` |                   **v12** | **Must** include `schemas/gschemas.compiled` inside the ZIP.                            |
-
-> On the E.G.O. page you can pick **Shell version** (42/43/44/45) and the matching **Extension version** (v12 for 42–44, v7 for 45+) from the dropdowns.
+| Build (branch)              |     GNOME | Settings schema ID                         | Packaging notes                                               |
+| --------------------------- | --------: | ------------------------------------------ | ------------------------------------------------------------- |
+| **Main** (`main`)           |   **45+** | `org.gnome.shell.extensions.numeric-clock` | Do not include `schemas/gschemas.compiled`. Metadata includes `"icon": "icon.png"`. |
+| **Legacy** (`legacy/42-44`) | **42–44** | `org.gnome.shell.extensions.numeric-clock` | Must include `schemas/gschemas.compiled` inside the ZIP.      |
 
 ---
 
 ## Install
 
-### A) From **extensions.gnome.org** (recommended)
-
-1. Open [https://extensions.gnome.org/extension/8566/numeric-clock/](https://extensions.gnome.org/extension/8566/numeric-clock/)
-2. In **Download**, set **Shell version** to your GNOME, then choose:
-
-   * **GNOME 45+ → Extension version v7**
-   * **GNOME 42–44 → Extension version v12**
-3. Click **Install** (with the browser integration), or download and install manually:
-
-### B) Manual install (ZIP)
+### Manual install (ZIP)
 
 ```bash
 # 45+
@@ -138,11 +125,6 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 
 ## Packaging & releases (for maintainers)
 
-**E.G.O. reads the integer `"version"` in `metadata.json`:**
-
-* **45+ build** → `"version": 7`
-* **42–44 build** → `"version": 12`
-
 **Common metadata fields:**
 
 ```json
@@ -177,7 +159,6 @@ gnome-extensions pack . --force --out-dir ..
 **Release flow**
 
 1. Upload the appropriate ZIP(s) to **GitHub Releases**.
-2. On **E.G.O.**, submit the **45+** update (v7) and keep **legacy v12** available via the dropdowns.
 
 > Do **not** commit `schemas/gschemas.compiled` to the repo; it’s a build artifact (only inside the legacy ZIP).
 
