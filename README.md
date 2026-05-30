@@ -11,6 +11,8 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 **UUID:** `numeric-clock@nickotmazgin` · **License:** MIT
 
+> **Keywords:** GNOME clock · numeric date · DD/MM/YYYY · 24-hour time · seconds · top bar · Israel timezone · Linux desktop · open source
+
 > Using GNOME **42–44**? See the [`legacy/42-44` branch](../../tree/legacy/42-44).
 
 ---
@@ -182,3 +184,11 @@ MIT © Nick Otmazgin — see [LICENSE](LICENSE).
 ## Contact
 
 [nickotmazgin.dev@gmail.com](mailto:nickotmazgin.dev@gmail.com)
+
+---
+
+## Find this project
+
+**GitHub topics:** `gnome-shell-extension` · `clock` · `24-hour` · `numeric-date` · `top-bar` · `seconds` · `wayland` · `linux` · `open-source`
+
+**Search for:** GNOME numeric clock, Linux top bar date format, DD/MM/YYYY clock extension, 24 hour clock GNOME
