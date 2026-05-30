@@ -1,5 +1,15 @@
-* @nickotmazgin
+# CODEOWNERS: auto-request reviews on changes (non-blocking)
+# Branch protection uses CI checks only — no required human approval (solo maintainer)
 
-# Optional: restrict GitHub UI to require CODEOWNERS review on protected branches
-# Enable in repo settings: Branch protection -> Require review from Code Owners
+# Core extension (ESM)
+/src/extension.js          @nickotmazgin
+/src/prefs.js              @nickotmazgin
+/src/metadata.json         @nickotmazgin
+/src/schemas/**            @nickotmazgin
 
+# Legacy build
+/src-legacy/**             @nickotmazgin
+
+# Build, tooling, CI
+/tools/**                  @nickotmazgin
+/.github/workflows/**      @nickotmazgin
