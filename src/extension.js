@@ -14,7 +14,7 @@ const DAYS   = /\b(sun|mon|tue|wed|thu|fri|sat)\b/i;
 function formatNow(fmt) {
   const dt = GLib.DateTime.new_now_local();
   try { return dt.format(fmt); }
-  catch { return dt.format('%d/%m/%Y %H:%M'); }
+  catch { return dt.format('%d/%m/%Y %H:%M:%S'); }
 }
 
 function looksLikeClock(txt) {
@@ -33,6 +33,21 @@ function allStageLabels() {
     }
   })(global.stage);
   return out;
+}
+
+function connectStageSignal(stage, modernSignal, legacySignal, callback) {
+  if (!stage || typeof stage.connect !== 'function')
+    return 0;
+  try { return stage.connect(modernSignal, callback); }
+  catch {
+    try { return stage.connect(legacySignal, callback); }
+    catch { return 0; }
+  }
+}
+
+function disconnectStageSignal(stage, id) {
+  if (!stage || !id) return;
+  try { stage.disconnect(id); } catch {}
 }
 
 export default class NumericClockExtension extends Extension {
@@ -139,8 +154,10 @@ export default class NumericClockExtension extends Extension {
       this._settings.connect('changed::format-string', () => this._updateAllNow()),
       this._settings.connect('changed::update-interval', () => this._restartTimer()),
     );
-    this._stageAddedId   = global.stage.connect('actor-added',   () => this._updateAllNow());
-    this._stageRemovedId = global.stage.connect('actor-removed', () => this._updateAllNow());
+    this._stageAddedId = connectStageSignal(
+      global.stage, 'child-added', 'actor-added', () => this._updateAllNow());
+    this._stageRemovedId = connectStageSignal(
+      global.stage, 'child-removed', 'actor-removed', () => this._updateAllNow());
     this._restartTimer();
   }
 
@@ -155,8 +172,8 @@ export default class NumericClockExtension extends Extension {
     }
     this._settingsChangedIds = [];
 
-    if (this._stageAddedId)   { try { global.stage.disconnect(this._stageAddedId); } catch {}   this._stageAddedId = 0; }
-    if (this._stageRemovedId) { try { global.stage.disconnect(this._stageRemovedId); } catch {} this._stageRemovedId = 0; }
+    if (this._stageAddedId)   { disconnectStageSignal(global.stage, this._stageAddedId);   this._stageAddedId = 0; }
+    if (this._stageRemovedId) { disconnectStageSignal(global.stage, this._stageRemovedId); this._stageRemovedId = 0; }
 
     for (const [actor, id] of this._textSignalIds) {
       try { actor.disconnect(id); } catch {}

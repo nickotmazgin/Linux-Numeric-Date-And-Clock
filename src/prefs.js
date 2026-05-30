@@ -17,7 +17,7 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     const group = new Adw.PreferencesGroup({ title: _('Numeric Clock') });
 
     const rowFmt = new Adw.ActionRow({ title: _('Format string') });
-    const entry = new Gtk.Entry({ hexpand: true, placeholder_text: '%A %d/%m/%Y %H:%M' });
+    const entry = new Gtk.Entry({ hexpand: true, placeholder_text: '%d/%m/%Y %H:%M:%S' });
     entry.text = settings.get_string('format-string');
     entry.connect('changed', w => settings.set_string('format-string', w.text));
     rowFmt.add_suffix(entry);
@@ -29,7 +29,7 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     const preview = new Gtk.Label({ hexpand: true, selectable: true, xalign: 1 });
     function formatNow(fmt) {
       try { return GLib.DateTime.new_now_local().format(fmt); }
-      catch (_) { return GLib.DateTime.new_now_local().format('%d/%m/%Y %H:%M'); }
+      catch (_) { return GLib.DateTime.new_now_local().format('%d/%m/%Y %H:%M:%S'); }
     }
     function refreshPreview() {
       preview.label = formatNow(settings.get_string('format-string'));
@@ -70,16 +70,28 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     const rowPresets = new Adw.ActionRow({ title: _('Presets') });
     const btnDefault = new Gtk.Button({ label: _('Default') });
     const btnSeconds = new Gtk.Button({ label: _('Seconds') });
+    const btnIsrael = new Gtk.Button({ label: _('Israel') });
     btnDefault.connect('clicked', () => {
-      settings.set_string('format-string', '%A %d/%m/%Y %H:%M');
-      settings.set_int('update-interval', 60);
+      settings.set_string('format-string', '%d/%m/%Y %H:%M:%S');
+      settings.set_int('update-interval', 1);
+      settings.set_boolean('smooth-second', true);
       entry.text = settings.get_string('format-string');
-      if (typeof spin.set_value === 'function') spin.set_value(60);
+      if (typeof spin.set_value === 'function') spin.set_value(1);
       refreshPreview();
     });
     btnSeconds.connect('clicked', () => {
       settings.set_string('format-string', '%A %d/%m/%Y %H:%M:%S');
       settings.set_int('update-interval', 1);
+      settings.set_boolean('smooth-second', true);
+      entry.text = settings.get_string('format-string');
+      if (typeof spin.set_value === 'function') spin.set_value(1);
+      refreshPreview();
+    });
+    btnIsrael.connect('clicked', () => {
+      settings.set_string('format-string', '%d/%m/%Y %H:%M:%S');
+      settings.set_int('update-interval', 1);
+      settings.set_boolean('smooth-second', true);
+      settings.set_boolean('only-topbar', true);
       entry.text = settings.get_string('format-string');
       if (typeof spin.set_value === 'function') spin.set_value(1);
       refreshPreview();
@@ -87,6 +99,7 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     const btnBox = new Gtk.Box({ spacing: 6 });
     btnBox.append(btnDefault);
     btnBox.append(btnSeconds);
+    btnBox.append(btnIsrael);
     rowPresets.add_suffix(btnBox);
     group.add(rowPresets);
 
@@ -97,6 +110,7 @@ export default class NumericClockPrefs extends ExtensionPreferences {
       try {
         settings.reset('format-string');
         settings.reset('update-interval');
+        settings.reset('smooth-second');
         entry.text = settings.get_string('format-string');
         if (typeof spin.set_value === 'function') spin.set_value(settings.get_int('update-interval'));
         refreshPreview();

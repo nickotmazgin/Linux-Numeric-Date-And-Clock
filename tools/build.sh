@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Build GNOME Shell extension ZIPs for both variants.
-# - src        → GNOME 45–47 (ESM)
+# - src        → GNOME 45–50 (ESM)
 # - src-legacy → GNOME 42–44 (classic)
 
 ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
@@ -49,10 +49,12 @@ pack_dir() {
     rm -f "$tmpdir/schemas/gschemas.compiled" 2>/dev/null || true
   fi
 
-  # Pack: prefer gnome-extensions, else plain zip
+  # Pack: legacy builds use plain zip to ensure gschemas.compiled is included
   local basezip="$dist/${uuid}.shell-extension.zip"
   rm -f "$basezip"
-  if have gnome-extensions; then
+  if [[ "$compile_schemas" == "true" ]]; then
+    (cd "$tmpdir" && zip -qr "$basezip" .)
+  elif have gnome-extensions; then
     local out
     out=$(gnome-extensions pack "$tmpdir" --force --out-dir "$dist")
     basezip=$(echo "$out" | sed -n -E 's/^Created[[:space:]]+(.+)$/\1/p')
@@ -67,7 +69,7 @@ pack_dir() {
   echo "$dest"
 }
 
-echo "Building ESM (GNOME 45–47) from: $ESM_DIR"
+echo "Building ESM (GNOME 45–50) from: $ESM_DIR"
 esm_tmp=$(mktemp -d)
 esm_zip=$(pack_dir "$ESM_DIR" "$esm_tmp" "$DIST_DIR" false)
 # Strip compiled schemas from ESM build if present

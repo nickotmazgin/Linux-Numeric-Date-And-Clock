@@ -2,12 +2,12 @@
 <schemalist>
   <schema id="org.gnome.shell.extensions.numeric-clock" path="/org/gnome/shell/extensions/numeric-clock/">
     <key name="format-string" type="s">
-      <default>'%A %d/%m/%Y %H:%M'</default>
+      <default>'%d/%m/%Y %H:%M:%S'</default>
       <summary>Clock format</summary>
-      <description>strftime format string for the top bar clock.</description>
+      <description>strftime format string for the top bar clock. Uses the system timezone (e.g. Asia/Jerusalem).</description>
     </key>
     <key name="update-interval" type="i">
-      <default>60</default>
+      <default>1</default>
       <summary>Update interval (seconds)</summary>
       <description>How often to refresh the label.</description>
       <range min="1" max="300"/>
@@ -18,7 +18,7 @@
       <description>If true, only modify the GNOME top bar DateMenu label, leaving other panels/taskbars untouched.</description>
     </key>
     <key name="smooth-second" type="b">
-      <default>false</default>
+      <default>true</default>
       <summary>Smooth tick alignment</summary>
       <description>Align the first update to the next second boundary when the interval is 1s.</description>
     </key>
