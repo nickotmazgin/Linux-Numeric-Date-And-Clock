@@ -13,7 +13,7 @@
       <range min="1" max="300"/>
     </key>
     <key name="only-topbar" type="b">
-      <default>false</default>
+      <default>true</default>
       <summary>Only override top bar DateMenu</summary>
       <description>If true, only modify the GNOME top bar DateMenu label, leaving other panels/taskbars untouched.</description>
     </key>

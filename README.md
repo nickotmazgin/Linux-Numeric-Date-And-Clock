@@ -7,7 +7,9 @@
 
 A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY** and **24-hour** time with optional **seconds**.
 
-**Latest:** v17.3.0 — ESM build v20 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
+**Latest:** v17.3.1 — ESM build v21 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
+
+> **Previous releases superseded** — download only [v17.3.1](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest).
 
 **UUID:** `numeric-clock@nickotmazgin` · **License:** MIT
 
@@ -35,10 +37,11 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 * Fully numeric date/time — you choose the `strftime` **format string**
 * **Israel-friendly defaults:** `DD/MM/YYYY HH:MM:SS` (24-hour, seconds, system timezone e.g. `Asia/Jerusalem`)
-* **Instant-apply** preferences — changes apply as you type
+* **Live preview** in settings — ticks every second when format shows seconds
 * Configurable **update interval** (1–300 seconds)
 * **Smooth second tick** alignment when showing seconds
-* Presets: Default, Seconds (with weekday), Israel (top bar only)
+* Presets: Default, Seconds (with weekday), **DD/MM + seconds** (any timezone)
+* **Restore default clock** when disabled or uninstalled
 * Safe plain-text rendering (no Pango markup)
 * No network access, telemetry, or external services
 
@@ -48,7 +51,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 | Build (branch)              |     GNOME | Extension version | Packaging notes                                               |
 | --------------------------- | --------: | ----------------: | ------------------------------------------------------------- |
-| **Main** (`main`)           | **45–50** |                20 | Do not include `schemas/gschemas.compiled`. Metadata omits `icon`. |
+| **Main** (`main`)           | **45–50** |                21 | Do not include `schemas/gschemas.compiled`. Metadata omits `icon`. |
 | **Legacy** (`legacy/42-44`) | **42–44** |                18 | Must include `schemas/gschemas.compiled` inside the ZIP.      |
 
 ---
@@ -59,7 +62,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 ```bash
 # GNOME 45–50 (ESM)
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v20.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v21.shell-extension.zip
 
 # GNOME 42–44 (legacy)
 gnome-extensions install --force dist/numeric-clock@nickotmazgin.v18.shell-extension.zip
@@ -73,7 +76,7 @@ gnome-extensions prefs numeric-clock@nickotmazgin
 ```bash
 ./tools/build.sh
 ./tools/validate.sh
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v20.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v21.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 ```
 

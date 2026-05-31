@@ -24,18 +24,35 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     rowFmt.activatable_widget = entry;
     group.add(rowFmt);
 
-    // Live preview
-    const rowPreview = new Adw.ActionRow({ title: _('Preview') });
+    // Live preview (ticks every second when format shows seconds)
+    const rowPreview = new Adw.ActionRow({
+      title: _('Preview'),
+      subtitle: _('Live clock sample — add %S or %T in the format string to show seconds'),
+    });
     const preview = new Gtk.Label({ hexpand: true, selectable: true, xalign: 1 });
+    let previewTimer = 0;
     function formatNow(fmt) {
       try { return GLib.DateTime.new_now_local().format(fmt); }
       catch (_) { return GLib.DateTime.new_now_local().format('%d/%m/%Y %H:%M:%S'); }
     }
+    function formatShowsSeconds(fmt) {
+      return /%[0-9]*S|%[0-9]*T|%\d*[EOe]/.test(fmt || '');
+    }
     function refreshPreview() {
-      preview.label = formatNow(settings.get_string('format-string'));
+      const fmt = settings.get_string('format-string');
+      preview.label = formatNow(fmt);
+      const intervalSec = settings.get_int('update-interval');
+      const tickMs = formatShowsSeconds(fmt) || intervalSec <= 1 ? 1000 : Math.max(1000, intervalSec * 1000);
+      if (previewTimer)
+        GLib.source_remove(previewTimer);
+      previewTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, tickMs, () => {
+        preview.label = formatNow(settings.get_string('format-string'));
+        return GLib.SOURCE_CONTINUE;
+      });
     }
     refreshPreview();
     settings.connect('changed::format-string', refreshPreview);
+    settings.connect('changed::update-interval', refreshPreview);
     rowPreview.add_suffix(preview);
     group.add(rowPreview);
 
@@ -67,10 +84,13 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     group.add(rowSmooth);
 
     // Presets
-    const rowPresets = new Adw.ActionRow({ title: _('Presets') });
+    const rowPresets = new Adw.ActionRow({
+      title: _('Presets'),
+      subtitle: _('Quick formats for any timezone — uses your system clock (e.g. Asia/Jerusalem)'),
+    });
     const btnDefault = new Gtk.Button({ label: _('Default') });
     const btnSeconds = new Gtk.Button({ label: _('Seconds') });
-    const btnIsrael = new Gtk.Button({ label: _('Israel') });
+    const btnIsrael = new Gtk.Button({ label: _('DD/MM + seconds') });
     btnDefault.connect('clicked', () => {
       settings.set_string('format-string', '%d/%m/%Y %H:%M:%S');
       settings.set_int('update-interval', 1);
