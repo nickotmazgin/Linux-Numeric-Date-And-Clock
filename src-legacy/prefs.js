@@ -87,16 +87,24 @@ function buildPrefsWidget() {
   const presetsLabel = new Gtk.Label({ label: _('Presets'), halign: Gtk.Align.START });
   const btnDefault = new Gtk.Button({ label: _('Default') });
   const btnSeconds = new Gtk.Button({ label: _('Seconds') });
+  const btnDdMm = new Gtk.Button({ label: _('DD/MM + seconds') });
   btnDefault.connect('clicked', () => {
-    settings.set_string('format-string', '%A %d/%m/%Y %H:%M');
-    if (typeof spin.set_value === 'function') spin.set_value(60);
-    settings.set_int('update-interval', 60);
+    settings.set_string('format-string', '%d/%m/%Y %H:%M:%S');
+    if (typeof spin.set_value === 'function') spin.set_value(1);
+    settings.set_int('update-interval', 1);
     refreshPreview();
   });
   btnSeconds.connect('clicked', () => {
     settings.set_string('format-string', '%A %d/%m/%Y %H:%M:%S');
     if (typeof spin.set_value === 'function') spin.set_value(1);
     settings.set_int('update-interval', 1);
+    refreshPreview();
+  });
+  btnDdMm.connect('clicked', () => {
+    settings.set_string('format-string', '%d/%m/%Y %H:%M:%S');
+    if (typeof spin.set_value === 'function') spin.set_value(1);
+    settings.set_int('update-interval', 1);
+    settings.set_boolean('only-topbar', true);
     refreshPreview();
   });
 
@@ -114,8 +122,20 @@ function buildPrefsWidget() {
   grid.attach(smoothLabel,0,5,1,1);
   grid.attach(smoothSwitch,1,5,1,1);
   grid.attach(presetsLabel,0,6,1,1);
-  grid.attach(btnDefault, 1,6,1,1);
-  grid.attach(btnSeconds, 1,7,1,1);
+  const presetBox = new Gtk.Box({ spacing: 6, orientation: Gtk.Orientation.HORIZONTAL });
+  presetBox.append(btnDefault);
+  presetBox.append(btnSeconds);
+  presetBox.append(btnDdMm);
+  grid.attach(presetBox, 1, 6, 1, 1);
+
+  const aboutLabel = new Gtk.Label({ label: _('About'), halign: Gtk.Align.START });
+  const aboutInfo = new Gtk.Label({
+    halign: Gtk.Align.START,
+    wrap: true,
+    label: _('Numeric Clock v17.3.2\nDeveloper: Nick Otmazgin\nEmail: nickotmazgin.dev@gmail.com\nhttps://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock'),
+  });
+  grid.attach(aboutLabel, 0, 7, 1, 1);
+  grid.attach(aboutInfo, 1, 7, 1, 1);
 
   // ---- Support / Donate ----
   const supportLabel = new Gtk.Label({ label: _('Support'), halign: Gtk.Align.START });

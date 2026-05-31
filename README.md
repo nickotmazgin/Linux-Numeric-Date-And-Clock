@@ -7,9 +7,9 @@
 
 A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY** and **24-hour** time with optional **seconds**.
 
-**Latest:** v17.3.1 — ESM build v21 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
+**Latest:** v17.3.2 — ESM build v22 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
 
-> **Previous releases superseded** — download only [v17.3.1](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest).
+> Download only [v17.3.2](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest).
 
 **UUID:** `numeric-clock@nickotmazgin` · **License:** MIT
 
@@ -51,7 +51,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 | Build (branch)              |     GNOME | Extension version | Packaging notes                                               |
 | --------------------------- | --------: | ----------------: | ------------------------------------------------------------- |
-| **Main** (`main`)           | **45–50** |                21 | Do not include `schemas/gschemas.compiled`. Metadata omits `icon`. |
+| **Main** (`main`)           | **45–50** |                22 | Do not include `schemas/gschemas.compiled`. Metadata omits `icon`. |
 | **Legacy** (`legacy/42-44`) | **42–44** |                18 | Must include `schemas/gschemas.compiled` inside the ZIP.      |
 
 ---
