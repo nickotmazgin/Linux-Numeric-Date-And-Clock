@@ -35,13 +35,28 @@ function allStageLabels() {
   return out;
 }
 
-function connectStageSignal(stage, modernSignal, legacySignal, callback) {
+function shellMajor() {
+  try {
+    const Config = imports.misc.config;
+    const ver = Config.PACKAGE_VERSION || '';
+    const major = parseInt(String(ver).split('.')[0], 10);
+    if (Number.isFinite(major) && major > 0)
+      return major;
+  } catch (_e) {}
+  return 46;
+}
+
+/** GNOME 45+ MetaStage uses child-*; older shells use actor-*. Never connect actor-* on 45+. */
+function connectStageSignal(stage, addedOrRemoved, callback) {
   if (!stage || typeof stage.connect !== 'function')
     return 0;
-  try { return stage.connect(modernSignal, callback); }
-  catch {
-    try { return stage.connect(legacySignal, callback); }
-    catch { return 0; }
+  const modern = addedOrRemoved === 'removed' ? 'child-removed' : 'child-added';
+  const legacy = addedOrRemoved === 'removed' ? 'actor-removed' : 'actor-added';
+  const sig = shellMajor() >= 45 ? modern : legacy;
+  try {
+    return stage.connect(sig, callback);
+  } catch (_e) {
+    return 0;
   }
 }
 
@@ -154,10 +169,8 @@ export default class NumericClockExtension extends Extension {
       this._settings.connect('changed::format-string', () => this._updateAllNow()),
       this._settings.connect('changed::update-interval', () => this._restartTimer()),
     );
-    this._stageAddedId = connectStageSignal(
-      global.stage, 'child-added', 'actor-added', () => this._updateAllNow());
-    this._stageRemovedId = connectStageSignal(
-      global.stage, 'child-removed', 'actor-removed', () => this._updateAllNow());
+    this._stageAddedId = connectStageSignal(global.stage, 'added', () => this._updateAllNow());
+    this._stageRemovedId = connectStageSignal(global.stage, 'removed', () => this._updateAllNow());
     this._restartTimer();
   }
 
@@ -181,6 +194,25 @@ export default class NumericClockExtension extends Extension {
     }
     this._textSignalIds = [];
 
+    this._restoreDefaultClocks();
     this._settings = null;
+  }
+
+  _restoreDefaultClocks() {
+    const dm = Main.panel?.statusArea?.dateMenu;
+    if (dm) {
+      for (const method of ['_updateClock', '_updateClockDisplay', '_update']) {
+        if (typeof dm[method] === 'function') {
+          try { dm[method](); break; } catch {}
+        }
+      }
+    }
+    for (const lab of this._collectClockLabels()) {
+      if (!lab || typeof lab.set_text !== 'function') continue;
+      try {
+        const ct = lab.clutter_text;
+        if (ct && ct[HOOKED]) delete ct[HOOKED];
+      } catch {}
+    }
   }
 }
