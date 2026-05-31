@@ -29,7 +29,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 ## Screenshot
 
-![Numeric Clock — top bar, settings, and about (2026)](screenshots/collage-2026.png)
+![Numeric Clock — top bar, settings, and about (2026)](screenshots/collage-2026.jpg)
 
 ---
 
