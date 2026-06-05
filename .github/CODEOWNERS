@@ -7,9 +7,6 @@
 /src/metadata.json         @nickotmazgin
 /src/schemas/**            @nickotmazgin
 
-# Legacy build
-/src-legacy/**             @nickotmazgin
-
 # Build, tooling, CI
 /tools/**                  @nickotmazgin
 /.github/workflows/**      @nickotmazgin

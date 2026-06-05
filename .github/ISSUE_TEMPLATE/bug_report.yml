@@ -21,8 +21,7 @@ body:
     attributes:
       label: Build
       options:
-        - 45–47 (ESM)
-        - 42–44 (legacy)
+        - 45–50 (ESM)
     validations:
       required: true
   - type: textarea

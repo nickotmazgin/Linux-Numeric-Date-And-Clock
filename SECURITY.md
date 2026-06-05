@@ -7,10 +7,9 @@ We maintain security fixes for the currently released builds of Numeric Clock:
 
 | Extension branch | GNOME Shell | Version line | Status              |
 | ---------------- | ----------- | ------------ | ------------------- |
-| `main`           | 45–47       | **v17.x**    | Actively supported  |
-| `legacy/42-44`   | 42–44       | **v16.x**    | Critical fixes only |
+| `main`           | 45–50       | **v17.x**    | Actively supported  |
 
-If you’re on an older line, please upgrade to a supported version.
+GNOME Shell **42–44** support has ended. Upgrade to GNOME **45** or newer.
 
 ## Reporting a vulnerability
 
@@ -27,8 +26,6 @@ Include, if possible:
 * Steps to reproduce
 * Affected GNOME Shell version(s) and OS
 * Relevant logs (e.g. `journalctl --user -b 0 -o cat | grep -i numeric-clock`)
-* Whether the issue also affects the legacy 42–44 build
-
 ## Response & disclosure timeline
 
 * **Acknowledgement:** within **48 hours**

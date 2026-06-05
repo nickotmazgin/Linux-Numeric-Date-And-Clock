@@ -15,7 +15,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 > **Keywords:** GNOME clock · numeric date · DD/MM/YYYY · 24-hour time · seconds · top bar · Israel timezone · Linux desktop · open source
 
-> Using GNOME **42–44**? See the [`legacy/42-44` branch](../../tree/legacy/42-44).
+> **GNOME Shell 42–44 is no longer supported.** Numeric Clock requires **GNOME 45–50**.
 
 ---
 
@@ -47,12 +47,14 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 ---
 
-## Compatibility & builds
+## Compatibility
 
-| Build (branch)              |     GNOME | Extension version | Packaging notes                                               |
-| --------------------------- | --------: | ----------------: | ------------------------------------------------------------- |
-| **Main** (`main`)           | **45–50** |                22 | Do not include `schemas/gschemas.compiled`. Metadata omits `icon`. |
-| **Legacy** (`legacy/42-44`) | **42–44** |                18 | Must include `schemas/gschemas.compiled` inside the ZIP.      |
+| GNOME | Status | Extension version | Notes |
+| ----- | ------ | ----------------: | ----- |
+| **45–50** | **Supported** | 22 | ESM build; do not ship `schemas/gschemas.compiled` |
+| **42–44** | **Discontinued** | — | No longer built or maintained |
+
+**Minimum requirement:** GNOME Shell **45**.
 
 ---
 
@@ -61,12 +63,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 ### From GitHub release (recommended)
 
 ```bash
-# GNOME 45–50 (ESM)
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v21.shell-extension.zip
-
-# GNOME 42–44 (legacy)
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v18.shell-extension.zip
-
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v22.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 gnome-extensions prefs numeric-clock@nickotmazgin
 ```
@@ -76,12 +73,11 @@ gnome-extensions prefs numeric-clock@nickotmazgin
 ```bash
 ./tools/build.sh
 ./tools/validate.sh
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v21.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v22.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 ```
 
-> **Note:** 45+ ZIPs **must not** contain `schemas/gschemas.compiled`.
-> 42–44 ZIPs **must** contain `schemas/gschemas.compiled`.
+> **Note:** Release ZIPs **must not** contain `schemas/gschemas.compiled`.
 
 After install, restart GNOME Shell: **Alt+F2** → `r` → Enter (Xorg) or log out/in (Wayland).
 
@@ -155,8 +151,7 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 ## Packaging & releases (maintainers)
 
 ```bash
-./tools/build.sh    # -> dist/numeric-clock@nickotmazgin.v20.shell-extension.zip (ESM)
-                    # -> dist/numeric-clock@nickotmazgin.v18.shell-extension.zip (legacy)
+./tools/build.sh    # -> dist/numeric-clock@nickotmazgin.v22.shell-extension.zip (GNOME 45–50)
 ./tools/validate.sh
 ```
 

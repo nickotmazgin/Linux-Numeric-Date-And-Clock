@@ -27,37 +27,24 @@ meta_field() {
   unzip -p "$zip" metadata.json | tr -d '\r' | sed -n -E "s/^[[:space:]]*\"${key}\"[[:space:]]*:[[:space:]]*\"?([^\",}]+)\"?.*$/\1/p" | head -n1
 }
 
-is_esm_zip() {
-  local zip="$1"
-  # ESM zips must not include compiled schemas
-  if zipinfo -1 "$zip" | grep -qx 'schemas/gschemas.compiled'; then
-    return 1
-  fi
-  return 0
-}
-
-pick_latest_by_version() {
-  # args: filter_fn_name (is_esm_zip|negate), outputs chosen zip
-  local fn="$1"; shift
+pick_latest_esm_zip() {
   local best_zip="" best_ver=0
   for z in dist/numeric-clock@nickotmazgin.v*.shell-extension.zip; do
     [[ -f "$z" ]] || continue
-    if "$fn" "$z"; then
-      local v
-      v=$(meta_field "$z" version)
-      [[ "$v" =~ ^[0-9]+$ ]] || continue
-      if (( v > best_ver )); then best_ver=$v; best_zip="$z"; fi
+    if zipinfo -1 "$z" | grep -qx 'schemas/gschemas.compiled'; then
+      continue
     fi
+    local v
+    v=$(meta_field "$z" version)
+    [[ "$v" =~ ^[0-9]+$ ]] || continue
+    if (( v > best_ver )); then best_ver=$v; best_zip="$z"; fi
   done
   echo -n "$best_zip"
 }
 
-negate() { ! is_esm_zip "$1"; }
-
 main() {
-  local esm_zip legacy_zip
-  esm_zip=$(pick_latest_by_version is_esm_zip)
-  legacy_zip=$(pick_latest_by_version negate)
+  local esm_zip
+  esm_zip=$(pick_latest_esm_zip)
 
   say "Checking ESM zip: ${esm_zip:-<none>}"
   if [[ -n "$esm_zip" ]]; then
@@ -69,18 +56,6 @@ main() {
     say "ESM version=$v shell-version=[$shellv]"
   else
     say "ERROR: no ESM zip found"; fail=1
-  fi
-
-  say "Checking legacy zip: ${legacy_zip:-<none>}"
-  if [[ -n "$legacy_zip" ]]; then
-    check_zip_has "$legacy_zip" schemas/gschemas.compiled
-    check_zip_has "$legacy_zip" metadata.json
-    local v shellv
-    v=$(meta_field "$legacy_zip" version)
-    shellv=$(unzip -p "$legacy_zip" metadata.json | tr -d '\n' | sed -n -E 's/.*"shell-version"\s*:\s*\[([^\]]+)\].*/\1/p')
-    say "LEGACY version=$v shell-version=[$shellv]"
-  else
-    say "ERROR: no legacy zip found"; fail=1
   fi
 
   exit $fail
