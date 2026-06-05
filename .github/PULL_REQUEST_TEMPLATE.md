@@ -2,7 +2,7 @@
 
 - [ ] Tests or manual validation performed
 - [ ] tools/build.sh + tools/validate.sh pass
-- [ ] For ESM: metadata has no `icon`; for legacy: ZIP includes compiled schemas
+- [ ] ESM metadata has no `icon`; release ZIP must not include `schemas/gschemas.compiled`
 
 ## Changes
 

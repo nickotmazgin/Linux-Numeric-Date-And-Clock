@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Build GNOME Shell extension ZIPs for both variants.
-# - src        → GNOME 45–50 (ESM)
-# - src-legacy → GNOME 42–44 (classic)
+# Build GNOME Shell extension ZIP for GNOME 45–50 (ESM).
 
 ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
 DIST_DIR="$ROOT_DIR/dist"
 ESM_DIR="$ROOT_DIR/src"
-LEGACY_DIR="$ROOT_DIR/src-legacy"
 
 mkdir -p "$DIST_DIR"
 
@@ -16,10 +13,7 @@ have() { command -v "$1" >/dev/null 2>&1; }
 have glib-compile-schemas || { echo "Missing required command: glib-compile-schemas" >&2; exit 1; }
 
 meta_val() {
-  # jq-less JSON field extractor for flat string/int fields in metadata.json
-  # usage: meta_val <key> <file>
   local key="$1" file="$2"
-  # Extract between quotes or as a number
   sed -n -E "s/^[[:space:]]*\"${key}\"[[:space:]]*:[[:space:]]*\"?([^\",}]+)\"?.*$/\1/p" "$file" | head -n1
 }
 
@@ -27,7 +21,6 @@ pack_dir() {
   local dir="$1"
   local tmpdir="$2"
   local dist="$3"
-  local compile_schemas="${4:-false}"
 
   local meta="$dir/metadata.json"
   [[ -f "$meta" ]] || { echo "metadata.json not found in $dir" >&2; exit 1; }
@@ -35,26 +28,14 @@ pack_dir() {
   uuid=$(meta_val uuid "$meta")
   version=$(meta_val version "$meta")
 
-  # Work from a temp copy so we can compile schemas for legacy
   rm -rf "$tmpdir"
   mkdir -p "$tmpdir"
   cp -a "$dir/"* "$tmpdir/"
+  rm -f "$tmpdir/schemas/gschemas.compiled" 2>/dev/null || true
 
-  if [[ "$compile_schemas" == "true" ]]; then
-    if [[ -f "$tmpdir/schemas/org.gnome.shell.extensions.numeric-clock.gschema.xml" ]]; then
-      (cd "$tmpdir" && glib-compile-schemas schemas || true)
-    fi
-  else
-    # Ensure we do not ship compiled schemas for 45+
-    rm -f "$tmpdir/schemas/gschemas.compiled" 2>/dev/null || true
-  fi
-
-  # Pack: legacy builds use plain zip to ensure gschemas.compiled is included
   local basezip="$dist/${uuid}.shell-extension.zip"
   rm -f "$basezip"
-  if [[ "$compile_schemas" == "true" ]]; then
-    (cd "$tmpdir" && zip -qr "$basezip" .)
-  elif have gnome-extensions; then
+  if have gnome-extensions; then
     local out
     out=$(gnome-extensions pack "$tmpdir" --force --out-dir "$dist")
     basezip=$(echo "$out" | sed -n -E 's/^Created[[:space:]]+(.+)$/\1/p')
@@ -71,19 +52,12 @@ pack_dir() {
 
 echo "Building ESM (GNOME 45–50) from: $ESM_DIR"
 esm_tmp=$(mktemp -d)
-esm_zip=$(pack_dir "$ESM_DIR" "$esm_tmp" "$DIST_DIR" false)
-# Strip compiled schemas from ESM build if present
+esm_zip=$(pack_dir "$ESM_DIR" "$esm_tmp" "$DIST_DIR")
 if command -v zip >/dev/null 2>&1; then
   zip -d "$esm_zip" 'schemas/gschemas.compiled' >/dev/null 2>&1 || true
 fi
 rm -rf "$esm_tmp"
 
-echo "Building legacy (GNOME 42–44) from: $LEGACY_DIR"
-legacy_tmp=$(mktemp -d)
-legacy_zip=$(pack_dir "$LEGACY_DIR" "$legacy_tmp" "$DIST_DIR" true)
-rm -rf "$legacy_tmp"
-
 echo
-echo "Done. Artifacts:"
+echo "Done. Artifact:"
 echo "  - $esm_zip"
-echo "  - $legacy_zip"
