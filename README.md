@@ -1,9 +1,17 @@
 # Numeric Clock (GNOME Shell Extension)
 
-[![Latest release](https://img.shields.io/github/v/release/nickotmazgin/Linux-Numeric-Date-And-Clock?label=release)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
-![GNOME Shell](https://img.shields.io/badge/GNOME%20Shell-45–50-4A86CF)
-![License](https://img.shields.io/badge/license-MIT-green)
-![i18n](https://img.shields.io/badge/i18n-enabled-blue)
+[![Release](https://img.shields.io/github/v/release/nickotmazgin/Linux-Numeric-Date-And-Clock?include_prereleases=false&display_name=tag&label=release)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/nickotmazgin/Linux-Numeric-Date-And-Clock/total?label=downloads&color=success)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases)
+[![License: MIT](https://img.shields.io/github/license/nickotmazgin/Linux-Numeric-Date-And-Clock)](LICENSE)
+[![GNOME 45–50](https://img.shields.io/badge/GNOME-45%E2%80%9350-4A86CF?logo=gnome&logoColor=white)](#compatibility)
+[![ESM](https://img.shields.io/badge/ESM-GJS%20modules-orange)](#compatibility)
+[![Wayland](https://img.shields.io/badge/Wayland-ready-0078D4)](#compatibility)
+
+[![Issues](https://img.shields.io/github/issues/nickotmazgin/Linux-Numeric-Date-And-Clock)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
+[![Discussions](https://img.shields.io/github/discussions/nickotmazgin/Linux-Numeric-Date-And-Clock?label=discussions&color=8B5CF6)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
+[![i18n](https://img.shields.io/badge/i18n-gettext-blue)](#features)
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-ff5c93?logo=github-sponsors&logoColor=white)](https://github.com/sponsors/nickotmazgin)
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-0070BA?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW)
 
 A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY** and **24-hour** time with optional **seconds**.
 
@@ -11,7 +19,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 > Download only [v17.3.2](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest).
 
-**UUID:** `numeric-clock@nickotmazgin` · **License:** MIT
+**UUID:** `numeric-clock@nickotmazgin`
 
 > **Keywords:** GNOME clock · numeric date · DD/MM/YYYY · 24-hour time · seconds · top bar · Israel timezone · Linux desktop · open source
 
@@ -175,7 +183,8 @@ MIT © Nick Otmazgin — see [LICENSE](LICENSE).
 
 ## Support
 
-**PayPal:** https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-ff5c93?logo=github-sponsors&logoColor=white)](https://github.com/sponsors/nickotmazgin)
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-0070BA?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW)
 
 ---
 
