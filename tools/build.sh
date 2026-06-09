@@ -52,11 +52,13 @@ pack_dir() {
 
 echo "Building ESM (GNOME 45–50) from: $ESM_DIR"
 esm_tmp=$(mktemp -d)
+trap 'rm -rf "$esm_tmp"' EXIT
 esm_zip=$(pack_dir "$ESM_DIR" "$esm_tmp" "$DIST_DIR")
 if command -v zip >/dev/null 2>&1; then
   zip -d "$esm_zip" 'schemas/gschemas.compiled' >/dev/null 2>&1 || true
 fi
 rm -rf "$esm_tmp"
+trap - EXIT
 
 echo
 echo "Done. Artifact:"

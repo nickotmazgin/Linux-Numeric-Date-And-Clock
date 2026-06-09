@@ -30,6 +30,8 @@ Thumbs.db
 __pycache__/
 *.pyc
 node_modules/
+.release-build/
+.package-build/
 
 # Security: Never commit secrets or credentials
 *.env

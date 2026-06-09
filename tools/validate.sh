@@ -27,33 +27,25 @@ meta_field() {
   unzip -p "$zip" metadata.json | tr -d '\r' | sed -n -E "s/^[[:space:]]*\"${key}\"[[:space:]]*:[[:space:]]*\"?([^\",}]+)\"?.*$/\1/p" | head -n1
 }
 
-pick_latest_esm_zip() {
-  local best_zip="" best_ver=0
-  for z in dist/numeric-clock@nickotmazgin.v*.shell-extension.zip; do
-    [[ -f "$z" ]] || continue
-    if zipinfo -1 "$z" | grep -qx 'schemas/gschemas.compiled'; then
-      continue
-    fi
-    local v
-    v=$(meta_field "$z" version)
-    [[ "$v" =~ ^[0-9]+$ ]] || continue
-    if (( v > best_ver )); then best_ver=$v; best_zip="$z"; fi
-  done
-  echo -n "$best_zip"
-}
-
 main() {
-  local esm_zip
-  esm_zip=$(pick_latest_esm_zip)
+  local expected_version expected_name esm_zip
+  expected_version=$(python3 -c 'import json; print(json.load(open("src/metadata.json"))["version"])')
+  expected_name=$(python3 -c 'import json; print(json.load(open("src/metadata.json"))["version-name"])')
+  esm_zip="dist/numeric-clock@nickotmazgin.v${expected_version}.shell-extension.zip"
 
   say "Checking ESM zip: ${esm_zip:-<none>}"
-  if [[ -n "$esm_zip" ]]; then
+  if [[ -f "$esm_zip" ]]; then
     check_zip_lacks "$esm_zip" schemas/gschemas.compiled
     check_zip_has   "$esm_zip" metadata.json
-    local v shellv
+    check_zip_has   "$esm_zip" schemas/org.gnome.shell.extensions.numeric-clock.gschema.xml
+    local v version_name shellv
     v=$(meta_field "$esm_zip" version)
-    shellv=$(unzip -p "$esm_zip" metadata.json | tr -d '\n' | sed -n -E 's/.*"shell-version"\s*:\s*\[([^\]]+)\].*/\1/p')
-    say "ESM version=$v shell-version=[$shellv]"
+    version_name=$(python3 -c 'import json,sys,zipfile; print(json.loads(zipfile.ZipFile(sys.argv[1]).read("metadata.json"))["version-name"])' "$esm_zip")
+    shellv=$(python3 -c 'import json,sys,zipfile; print(",".join(json.loads(zipfile.ZipFile(sys.argv[1]).read("metadata.json"))["shell-version"]))' "$esm_zip")
+    [[ "$v" = "$expected_version" ]] || { say "ERROR: version=$v, expected $expected_version"; fail=1; }
+    [[ "$version_name" = "$expected_name" ]] || { say "ERROR: version-name=$version_name, expected $expected_name"; fail=1; }
+    [[ "$shellv" = "45,46,47,48,49,50" ]] || { say "ERROR: shell-version=[$shellv]"; fail=1; }
+    say "ESM version=$v version-name=$version_name shell-version=[$shellv]"
   else
     say "ERROR: no ESM zip found"; fail=1
   fi
