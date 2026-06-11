@@ -5,6 +5,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Gettext from 'gettext';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { FORMAT_PRESETS, applyPresetToSettings } from './presets.js';
 
 const REPO_URL = 'https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock';
 const EMAIL = 'nickotmazgin.dev@gmail.com';
@@ -14,8 +15,8 @@ export default class NumericClockPrefs extends ExtensionPreferences {
   fillPreferencesWindow(window) {
     const settings = this.getSettings();
     const metadata = this.metadata || {};
-    window.default_width = 520;
-    window.default_height = 420;
+    window.default_width = 560;
+    window.default_height = 520;
 
     const _ = Gettext.domain('numeric-clock').gettext;
 
@@ -40,7 +41,7 @@ export default class NumericClockPrefs extends ExtensionPreferences {
 
     const rowPreview = new Adw.ActionRow({
       title: _('Preview'),
-      subtitle: _('Live clock sample — add %S or %T in the format string to show seconds'),
+      subtitle: _('Live sample — uses your system locale and timezone'),
     });
     const preview = new Gtk.Label({ hexpand: true, selectable: true, xalign: 1 });
     let previewTimer = 0;
@@ -80,7 +81,10 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     rowInt.activatable_widget = spin;
     group.add(rowInt);
 
-    const rowOnly = new Adw.ActionRow({ title: _('Only override top bar DateMenu') });
+    const rowOnly = new Adw.ActionRow({
+      title: _('Only override top bar DateMenu'),
+      subtitle: _('Recommended. Turning off may affect other panel clocks on some desktops.'),
+    });
     const swOnly = new Gtk.Switch({ active: settings.get_boolean('only-topbar') });
     swOnly.connect('notify::active', w => settings.set_boolean('only-topbar', w.active));
     rowOnly.add_suffix(swOnly);
@@ -96,7 +100,7 @@ export default class NumericClockPrefs extends ExtensionPreferences {
 
     const rowIcon = new Adw.ActionRow({
       title: _('Show panel access icon'),
-      subtitle: _('Clock icon in the top bar — click for preferences, presets, and copy time'),
+      subtitle: _('Digital clock icon in the top bar — click for preferences, presets, and copy time'),
     });
     const swIcon = new Gtk.Switch({ active: settings.get_boolean('show-panel-icon') });
     swIcon.connect('notify::active', w => settings.set_boolean('show-panel-icon', w.active));
@@ -104,34 +108,54 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     rowIcon.activatable_widget = swIcon;
     group.add(rowIcon);
 
-    const rowPresets = new Adw.ActionRow({
-      title: _('Presets'),
-      subtitle: _('Quick formats for any timezone — uses your system clock (e.g. Asia/Jerusalem)'),
+    const rowClockMenu = new Adw.ActionRow({
+      title: _('Right-click clock for quick menu'),
+      subtitle: _('Right-click or middle-click the formatted clock. Left-click still opens the GNOME calendar.'),
     });
-    const btnDefault = new Gtk.Button({ label: _('Default'), tooltip_text: _('%d/%m/%Y %H:%M:%S') });
-    const btnSeconds = new Gtk.Button({ label: _('Seconds'), tooltip_text: _('%A %d/%m/%Y %H:%M:%S') });
-    const btnDdMm = new Gtk.Button({ label: _('DD/MM + seconds'), tooltip_text: _('%d/%m/%Y %H:%M:%S — top bar only') });
-    const applyPreset = (fmt, interval, smooth, onlyTopbar) => {
-      settings.set_string('format-string', fmt);
-      settings.set_int('update-interval', interval);
-      settings.set_boolean('smooth-second', smooth);
-      if (onlyTopbar !== undefined)
-        settings.set_boolean('only-topbar', onlyTopbar);
+    const swClockMenu = new Gtk.Switch({ active: settings.get_boolean('clock-secondary-opens-menu') });
+    swClockMenu.connect('notify::active', w => settings.set_boolean('clock-secondary-opens-menu', w.active));
+    rowClockMenu.add_suffix(swClockMenu);
+    rowClockMenu.activatable_widget = swClockMenu;
+    group.add(rowClockMenu);
+
+    pageSettings.add(group);
+
+    const groupPresets = new Adw.PreferencesGroup({
+      title: _('Format presets'),
+      description: _('One-click formats — uses your system locale and timezone worldwide'),
+    });
+    const presetGrid = new Gtk.FlowBox({
+      selection_mode: Gtk.SelectionMode.NONE,
+      column_spacing: 8,
+      row_spacing: 8,
+      max_children_per_line: 3,
+      homogeneous: true,
+    });
+    const applyPreset = preset => {
+      applyPresetToSettings(settings, preset);
       entry.text = settings.get_string('format-string');
       if (typeof spin.set_value === 'function')
-        spin.set_value(interval);
+        spin.set_value(settings.get_int('update-interval'));
+      swOnly.active = settings.get_boolean('only-topbar');
+      swSmooth.active = settings.get_boolean('smooth-second');
       refreshPreview();
     };
-    btnDefault.connect('clicked', () => applyPreset('%d/%m/%Y %H:%M:%S', 1, true));
-    btnSeconds.connect('clicked', () => applyPreset('%A %d/%m/%Y %H:%M:%S', 1, true));
-    btnDdMm.connect('clicked', () => applyPreset('%d/%m/%Y %H:%M:%S', 1, true, true));
-    const btnBox = new Gtk.Box({ spacing: 6 });
-    btnBox.append(btnDefault);
-    btnBox.append(btnSeconds);
-    btnBox.append(btnDdMm);
-    rowPresets.add_suffix(btnBox);
-    group.add(rowPresets);
+    for (const preset of FORMAT_PRESETS) {
+      const btn = new Gtk.Button({
+        label: _(preset.label),
+        tooltip_text: preset.fmt,
+      });
+      btn.connect('clicked', () => applyPreset(preset));
+      const boxChild = new Gtk.FlowBoxChild();
+      boxChild.child = btn;
+      presetGrid.append(boxChild);
+    }
+    const presetRow = new Adw.ActionRow({ title: _('Apply preset') });
+    presetRow.add_suffix(presetGrid);
+    groupPresets.add(presetRow);
+    pageSettings.add(groupPresets);
 
+    const groupReset = new Adw.PreferencesGroup();
     const rowReset = new Adw.ActionRow({ title: _('Reset to defaults') });
     const btnReset = new Gtk.Button({ label: _('Reset') });
     btnReset.connect('clicked', () => {
@@ -141,19 +165,20 @@ export default class NumericClockPrefs extends ExtensionPreferences {
         settings.reset('smooth-second');
         settings.reset('only-topbar');
         settings.reset('show-panel-icon');
+        settings.reset('clock-secondary-opens-menu');
         entry.text = settings.get_string('format-string');
         if (typeof spin.set_value === 'function')
           spin.set_value(settings.get_int('update-interval'));
         swOnly.active = settings.get_boolean('only-topbar');
         swSmooth.active = settings.get_boolean('smooth-second');
         swIcon.active = settings.get_boolean('show-panel-icon');
+        swClockMenu.active = settings.get_boolean('clock-secondary-opens-menu');
         refreshPreview();
       } catch (_) {}
     });
     rowReset.add_suffix(btnReset);
-    group.add(rowReset);
-
-    pageSettings.add(group);
+    groupReset.add(rowReset);
+    pageSettings.add(groupReset);
 
     const pageAbout = new Adw.PreferencesPage({
       title: _('About'),
@@ -179,7 +204,7 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     }));
     groupInfo.add(new Adw.ActionRow({
       title: _('Description'),
-      subtitle: _('Numeric DD/MM/YYYY 24-hour top-bar clock with optional seconds and live preview.'),
+      subtitle: _('International numeric top-bar clock — configurable date/time format, panel icon, and live preview.'),
     }));
     pageAbout.add(groupInfo);
 

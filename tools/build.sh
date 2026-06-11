@@ -44,8 +44,13 @@ pack_dir() {
     (cd "$tmpdir" && zip -qr "$basezip" .)
   fi
 
-  if [[ -d "$tmpdir/icons" ]] && command -v zip >/dev/null 2>&1; then
-    (cd "$tmpdir" && zip -qr "$basezip" icons/)
+  if command -v zip >/dev/null 2>&1; then
+    if [[ -d "$tmpdir/icons" ]]; then
+      (cd "$tmpdir" && zip -qr "$basezip" icons/)
+    fi
+    if [[ -f "$tmpdir/presets.js" ]]; then
+      (cd "$tmpdir" && zip -q "$basezip" presets.js)
+    fi
   fi
 
   local dest="$dist/${uuid}.v${version}.shell-extension.zip"

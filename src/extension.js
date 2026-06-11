@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Numeric Clock — GNOME 45+ (ESM)
+import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -9,11 +10,14 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import { FORMAT_PRESETS, applyPresetToSettings } from './presets.js';
 
 const HOOKED = Symbol('nc-hooked');
+const CLICK_HOOKED = Symbol('nc-click-hooked');
 const TIME_RE = /(^|\s)\d{1,2}:\d{2}(:\d{2})?(\s|$)/i;
 const MONTHS = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/i;
 const DAYS   = /\b(sun|mon|tue|wed|thu|fri|sat)\b/i;
+const PANEL_TOOLTIP = 'Numeric Clock — click for quick menu';
 
 function formatNow(fmt) {
   const dt = GLib.DateTime.new_now_local();
@@ -49,7 +53,6 @@ function shellMajor() {
   return 46;
 }
 
-/** GNOME 45+ MetaStage uses child-*; older shells use actor-*. Never connect actor-* on 45+. */
 function connectStageSignal(stage, addedOrRemoved, callback) {
   if (!stage || typeof stage.connect !== 'function')
     return 0;
@@ -77,6 +80,17 @@ function copyTextToClipboard(text) {
   }
 }
 
+function menuItemWithIcon(label, iconName) {
+  const item = new PopupMenu.PopupMenuItem(label);
+  if (iconName) {
+    item.insert_child_at_index(
+      new St.Icon({ icon_name: iconName, style_class: 'popup-menu-icon' }),
+      0,
+    );
+  }
+  return item;
+}
+
 const NumericClockIndicator = GObject.registerClass(
 class NumericClockIndicator extends PanelMenu.Button {
   _init(settings, extensionPath, openPrefs) {
@@ -92,6 +106,8 @@ class NumericClockIndicator extends PanelMenu.Button {
       style_class: 'system-status-icon numeric-clock-icon',
     });
     this.add_child(icon);
+    if (typeof this.set_tooltip_text === 'function')
+      this.set_tooltip_text(PANEL_TOOLTIP);
     this._buildMenu();
 
     this._settingsChangedIds = [
@@ -136,14 +152,8 @@ class NumericClockIndicator extends PanelMenu.Button {
     });
   }
 
-  _applyPreset(fmt, interval, smooth, onlyTopbar) {
-    this._settings.set_string('format-string', fmt);
-    this._settings.set_int('update-interval', interval);
-    this._settings.set_boolean('smooth-second', smooth);
-    if (onlyTopbar !== undefined)
-      this._settings.set_boolean('only-topbar', onlyTopbar);
-    this._refreshMenuTime();
-    Main.notify('Numeric Clock', 'Format preset applied');
+  openQuickMenu() {
+    this.menu.open();
   }
 
   _buildMenu() {
@@ -154,25 +164,27 @@ class NumericClockIndicator extends PanelMenu.Button {
 
     this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-    const prefsItem = new PopupMenu.PopupMenuItem('Open Preferences');
+    const prefsItem = menuItemWithIcon('Open Preferences', 'preferences-system-symbolic');
     prefsItem.connect('activate', () => this._openPrefs());
     this.menu.addMenuItem(prefsItem);
 
-    const copyItem = new PopupMenu.PopupMenuItem('Copy current time');
+    const copyItem = menuItemWithIcon('Copy current time', 'edit-copy-symbolic');
     copyItem.connect('activate', () => {
       copyTextToClipboard(formatNow(this._settings.get_string('format-string')));
     });
     this.menu.addMenuItem(copyItem);
 
     const presets = new PopupMenu.PopupSubMenuMenuItem('Quick presets');
-    const addPreset = (label, fmt, interval, smooth, onlyTopbar) => {
-      const item = new PopupMenu.PopupMenuItem(label);
-      item.connect('activate', () => this._applyPreset(fmt, interval, smooth, onlyTopbar));
+    presets.icon.icon_name = 'document-edit-symbolic';
+    for (const preset of FORMAT_PRESETS) {
+      const item = new PopupMenu.PopupMenuItem(preset.label);
+      item.connect('activate', () => {
+        applyPresetToSettings(this._settings, preset);
+        this._refreshMenuTime();
+        Main.notify('Numeric Clock', 'Format preset applied');
+      });
       presets.menu.addMenuItem(item);
-    };
-    addPreset('Default (DD/MM/YYYY + seconds)', '%d/%m/%Y %H:%M:%S', 1, true);
-    addPreset('Weekday + seconds', '%A %d/%m/%Y %H:%M:%S', 1, true);
-    addPreset('Top bar only (DD/MM + seconds)', '%d/%m/%Y %H:%M:%S', 1, true, true);
+    }
     this.menu.addMenuItem(presets);
 
     this.menu.connect('open-state-changed', (_menu, open) => {
@@ -194,7 +206,8 @@ export default class NumericClockExtension extends Extension {
     this._stageAddedId = 0;
     this._stageRemovedId = 0;
     this._settingsChangedIds = [];
-    this._textSignalIds = []; // [ [actor, id], ... ]
+    this._textSignalIds = [];
+    this._clickSignalIds = [];
   }
 
   _collectClockLabels() {
@@ -227,6 +240,34 @@ export default class NumericClockExtension extends Extension {
       ct.set_use_markup(false);
   }
 
+  _hookClockClick(lab) {
+    if (!lab || lab[CLICK_HOOKED] || !this._indicator) return;
+    lab[CLICK_HOOKED] = true;
+    lab.reactive = true;
+    lab.track_hover = true;
+    const id = lab.connect('button-press-event', (_actor, event) => {
+      if (!this._settings?.get_boolean('clock-secondary-opens-menu'))
+        return Clutter.EVENT_PROPAGATE;
+      const btn = event.get_button();
+      if (btn === Clutter.BUTTON_SECONDARY || btn === Clutter.BUTTON_MIDDLE) {
+        this._indicator.openQuickMenu();
+        return Clutter.EVENT_STOP;
+      }
+      return Clutter.EVENT_PROPAGATE;
+    });
+    this._clickSignalIds.push([lab, id]);
+    if (this._settings?.get_boolean('clock-secondary-opens-menu') &&
+        typeof lab.set_tooltip_text === 'function')
+      lab.set_tooltip_text('Right-click for Numeric Clock menu');
+  }
+
+  _unhookClockClick(lab) {
+    if (!lab) return;
+    try { delete lab[CLICK_HOOKED]; } catch {}
+    if (typeof lab.set_tooltip_text === 'function')
+      lab.set_tooltip_text(null);
+  }
+
   _applyTo(lab) {
     if (!lab) return;
     this._forcePlain(lab);
@@ -243,11 +284,21 @@ export default class NumericClockExtension extends Extension {
       });
       this._textSignalIds.push([ct, id]);
     }
+    this._hookClockClick(lab);
+  }
+
+  _refreshClockTooltips() {
+    const showTip = this._settings.get_boolean('clock-secondary-opens-menu');
+    for (const lab of this._collectClockLabels()) {
+      if (typeof lab.set_tooltip_text !== 'function') continue;
+      lab.set_tooltip_text(showTip ? 'Right-click for Numeric Clock menu' : null);
+    }
   }
 
   _updateAllNow() {
     for (const lab of this._collectClockLabels())
       this._applyTo(lab);
+    this._refreshClockTooltips();
   }
 
   _restartTimer() {
@@ -304,6 +355,7 @@ export default class NumericClockExtension extends Extension {
       this._settings.connect('changed::smooth-second', () => this._restartTimer()),
       this._settings.connect('changed::only-topbar', () => this._updateAllNow()),
       this._settings.connect('changed::show-panel-icon', () => this._syncIndicator()),
+      this._settings.connect('changed::clock-secondary-opens-menu', () => this._refreshClockTooltips()),
     );
     this._stageAddedId = connectStageSignal(global.stage, 'added', () => this._updateAllNow());
     this._stageRemovedId = connectStageSignal(global.stage, 'removed', () => this._updateAllNow());
@@ -336,6 +388,12 @@ export default class NumericClockExtension extends Extension {
     }
     this._textSignalIds = [];
 
+    for (const [lab, id] of this._clickSignalIds) {
+      try { lab.disconnect(id); } catch {}
+      this._unhookClockClick(lab);
+    }
+    this._clickSignalIds = [];
+
     this._restoreDefaultClocks();
     this._settings = null;
   }
@@ -355,6 +413,7 @@ export default class NumericClockExtension extends Extension {
         const ct = lab.clutter_text;
         if (ct && ct[HOOKED]) delete ct[HOOKED];
       } catch {}
+      this._unhookClockClick(lab);
     }
   }
 }

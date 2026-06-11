@@ -1,5 +1,17 @@
 # Changelog
 
+## v17.4.1 — 2026-06-11
+
+**International polish, refined icon, and easier access.**
+
+- Redesign panel icon to a cleaner **digital display** style (readable at 16px)
+- Add **7 international format presets** (ISO, compact, time-only, US 12-hour, and more) via shared `presets.js`
+- **Tooltip** on panel icon; **right-click / middle-click** the formatted clock for the quick menu (left-click keeps GNOME calendar)
+- Documentation reframed for **worldwide** use — system locale/timezone, not region-specific
+- Menu items include symbolic icons; `only-topbar` preference shows a safety note
+
+> **Recommended upgrade** from v17.4.0 and earlier.
+
 ## v17.4.0 — 2026-06-11
 
 **Panel access icon and quick controls.**
