@@ -1,5 +1,14 @@
 # Changelog
 
+## v17.4.4 — 2026-06-11
+
+**Fix extension enable crash on GNOME Shell 46.**
+
+- Remove `theme.load_stylesheet()` (not available on Shell 46) — use `icon_size: 18` on the panel icon instead
+- Extension enables cleanly with no journal errors
+
+> **Recommended upgrade** from v17.4.3 and earlier.
+
 ## v17.4.3 — 2026-06-11
 
 **UI fixes, clearer panel icon, and release CI repair.**

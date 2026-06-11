@@ -41,7 +41,6 @@ main() {
     check_zip_has   "$esm_zip" prefs.js
     check_zip_has   "$esm_zip" presets.js
     check_zip_has   "$esm_zip" icons/numeric-clock-symbolic.svg
-    check_zip_has   "$esm_zip" stylesheet.css
     check_zip_has   "$esm_zip" schemas/org.gnome.shell.extensions.numeric-clock.gschema.xml
     check_zip_lacks "$esm_zip" tools/build.sh
     check_zip_lacks "$esm_zip" .env

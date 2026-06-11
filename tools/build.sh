@@ -51,9 +51,6 @@ pack_dir() {
     if [[ -f "$tmpdir/presets.js" ]]; then
       (cd "$tmpdir" && zip -q "$basezip" presets.js)
     fi
-    if [[ -f "$tmpdir/stylesheet.css" ]]; then
-      (cd "$tmpdir" && zip -q "$basezip" stylesheet.css)
-    fi
   fi
 
   local dest="$dist/${uuid}.v${version}.shell-extension.zip"
