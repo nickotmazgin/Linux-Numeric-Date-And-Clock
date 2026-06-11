@@ -1,5 +1,14 @@
 # Changelog
 
+## v17.4.2 — 2026-06-11
+
+**Fix extension enable crash on quick-presets submenu.**
+
+- `PopupSubMenuMenuItem` now passes `wantIcon=true` so `presets.icon` exists on GNOME 45–50
+- Extension enables cleanly again after disable or Shell reload
+
+> **Recommended upgrade** from v17.4.1 if enable failed with `TypeError: presets.icon is undefined`.
+
 ## v17.4.1 — 2026-06-11
 
 **International polish, refined icon, and easier access.**

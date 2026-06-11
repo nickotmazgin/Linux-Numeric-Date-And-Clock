@@ -174,8 +174,9 @@ class NumericClockIndicator extends PanelMenu.Button {
     });
     this.menu.addMenuItem(copyItem);
 
-    const presets = new PopupMenu.PopupSubMenuMenuItem('Quick presets');
-    presets.icon.icon_name = 'document-edit-symbolic';
+    const presets = new PopupMenu.PopupSubMenuMenuItem('Quick presets', true);
+    if (presets.icon)
+      presets.icon.icon_name = 'document-edit-symbolic';
     for (const preset of FORMAT_PRESETS) {
       const item = new PopupMenu.PopupMenuItem(preset.label);
       item.connect('activate', () => {
