@@ -1,0 +1,8 @@
+/* Numeric Clock — panel icon visibility */
+.numeric-clock-icon {
+  icon-size: 18px;
+}
+
+.panel-button.numeric-clock-panel .numeric-clock-icon {
+  icon-size: 18px;
+}

@@ -15,9 +15,9 @@
 
 A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY**, **ISO 8601**, **24-hour**, or **12-hour** time with optional **seconds**, anywhere in the world.
 
-**Latest:** v17.4.2 — ESM build v26 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
+**Latest:** v17.4.3 — ESM build v27 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
 
-> Download only [v17.4.2](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older releases are kept for history and marked superseded.
+> Download only [v17.4.3](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older releases are kept for history and marked superseded.
 
 **UUID:** `numeric-clock@nickotmazgin`
 
@@ -63,7 +63,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 | GNOME | Status | Extension version | Notes |
 | ----- | ------ | ----------------: | ----- |
-| **45–50** | **Supported** | 26 | ESM build; do not ship `schemas/gschemas.compiled` |
+| **45–50** | **Supported** | 27 | ESM build; do not ship `schemas/gschemas.compiled` |
 | **42–44** | **Discontinued** | — | No longer built or maintained |
 
 **Minimum requirement:** GNOME Shell **45**.
@@ -77,7 +77,7 @@ Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that 
 ### From GitHub release (recommended)
 
 ```bash
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v26.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v27.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 gnome-extensions prefs numeric-clock@nickotmazgin
 ```
@@ -87,7 +87,7 @@ gnome-extensions prefs numeric-clock@nickotmazgin
 ```bash
 ./tools/build.sh
 ./tools/validate.sh
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v26.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v27.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 ```
 
@@ -184,7 +184,7 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 ## Packaging & releases (maintainers)
 
 ```bash
-./tools/build.sh    # -> dist/numeric-clock@nickotmazgin.v26.shell-extension.zip (GNOME 45–50)
+./tools/build.sh    # -> dist/numeric-clock@nickotmazgin.v27.shell-extension.zip (GNOME 45–50)
 ./tools/validate.sh
 ```
 
