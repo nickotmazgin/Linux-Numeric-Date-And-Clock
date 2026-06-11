@@ -95,6 +95,7 @@ const NumericClockIndicator = GObject.registerClass(
 class NumericClockIndicator extends PanelMenu.Button {
   _init(settings, extensionPath, openPrefs) {
     super._init(0.0, 'Numeric Clock');
+    this.add_style_class_name('numeric-clock-panel');
     this._settings = settings;
     this._openPrefs = openPrefs;
     this._timeLabel = null;
@@ -202,6 +203,7 @@ export default class NumericClockExtension extends Extension {
     super(uuid);
     this._settings = null;
     this._indicator = null;
+    this._stylesheet = null;
     this._timeoutId = 0;
     this._msTimeoutId = 0;
     this._stageAddedId = 0;
@@ -340,8 +342,26 @@ export default class NumericClockExtension extends Extension {
     this._indicator.visible = show;
   }
 
+  _loadStylesheet() {
+    const path = GLib.build_filenamev([this.path, 'stylesheet.css']);
+    const file = Gio.File.new_for_path(path);
+    if (!file.query_exists(null))
+      return;
+    const theme = St.ThemeContext.get_for_stage(global.stage);
+    this._stylesheet = theme.load_stylesheet(file);
+  }
+
+  _unloadStylesheet() {
+    if (!this._stylesheet)
+      return;
+    const theme = St.ThemeContext.get_for_stage(global.stage);
+    theme.unload_stylesheet(this._stylesheet);
+    this._stylesheet = null;
+  }
+
   enable() {
     this._settings = this.getSettings();
+    this._loadStylesheet();
 
     this._indicator = new NumericClockIndicator(
       this._settings,
@@ -365,6 +385,8 @@ export default class NumericClockExtension extends Extension {
   }
 
   disable() {
+    this._unloadStylesheet();
+
     if (this._indicator) {
       this._indicator.destroy();
       this._indicator = null;

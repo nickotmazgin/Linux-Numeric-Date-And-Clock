@@ -1,5 +1,16 @@
 # Changelog
 
+## v17.4.3 — 2026-06-11
+
+**UI fixes, clearer panel icon, and release CI repair.**
+
+- Redesign panel icon as a **bold analog clock** (more visible, no keyboard-like segments)
+- Add `stylesheet.css` for slightly larger panel icon (18px)
+- Fix preferences presets layout — each preset is a normal horizontal row with **Apply** button (no vertical/garbled text)
+- Fix release CI `startup_failure` — pin `actions/checkout` SHA (same as validate workflow) and install `gnome-shell-extensions` on CI
+
+> **Recommended upgrade** from v17.4.2 and earlier.
+
 ## v17.4.2 — 2026-06-11
 
 **Fix extension enable crash on quick-presets submenu.**

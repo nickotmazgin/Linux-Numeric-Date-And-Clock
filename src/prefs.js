@@ -100,7 +100,7 @@ export default class NumericClockPrefs extends ExtensionPreferences {
 
     const rowIcon = new Adw.ActionRow({
       title: _('Show panel access icon'),
-      subtitle: _('Digital clock icon in the top bar — click for preferences, presets, and copy time'),
+      subtitle: _('Clock icon in the top bar — click for preferences, presets, and copy time'),
     });
     const swIcon = new Gtk.Switch({ active: settings.get_boolean('show-panel-icon') });
     swIcon.connect('notify::active', w => settings.set_boolean('show-panel-icon', w.active));
@@ -124,13 +124,6 @@ export default class NumericClockPrefs extends ExtensionPreferences {
       title: _('Format presets'),
       description: _('One-click formats — uses your system locale and timezone worldwide'),
     });
-    const presetGrid = new Gtk.FlowBox({
-      selection_mode: Gtk.SelectionMode.NONE,
-      column_spacing: 8,
-      row_spacing: 8,
-      max_children_per_line: 3,
-      homogeneous: true,
-    });
     const applyPreset = preset => {
       applyPresetToSettings(settings, preset);
       entry.text = settings.get_string('format-string');
@@ -141,18 +134,16 @@ export default class NumericClockPrefs extends ExtensionPreferences {
       refreshPreview();
     };
     for (const preset of FORMAT_PRESETS) {
-      const btn = new Gtk.Button({
-        label: _(preset.label),
-        tooltip_text: preset.fmt,
+      const row = new Adw.ActionRow({
+        title: _(preset.label),
+        subtitle: preset.fmt,
       });
+      const btn = new Gtk.Button({ label: _('Apply'), valign: Gtk.Align.CENTER });
       btn.connect('clicked', () => applyPreset(preset));
-      const boxChild = new Gtk.FlowBoxChild();
-      boxChild.child = btn;
-      presetGrid.append(boxChild);
+      row.add_suffix(btn);
+      row.activatable_widget = btn;
+      groupPresets.add(row);
     }
-    const presetRow = new Adw.ActionRow({ title: _('Apply preset') });
-    presetRow.add_suffix(presetGrid);
-    groupPresets.add(presetRow);
     pageSettings.add(groupPresets);
 
     const groupReset = new Adw.PreferencesGroup();
