@@ -28,7 +28,12 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     const rowFmt = new Adw.ActionRow({ title: _('Format string') });
     const entry = new Gtk.Entry({ hexpand: true, placeholder_text: '%d/%m/%Y %H:%M:%S' });
     entry.text = settings.get_string('format-string');
-    entry.connect('changed', w => settings.set_string('format-string', w.text));
+    entry.connect('changed', w => {
+      const text = String(w.text || '').slice(0, 128);
+      if (text !== w.text)
+        w.text = text;
+      settings.set_string('format-string', text);
+    });
     rowFmt.add_suffix(entry);
     rowFmt.activatable_widget = entry;
     group.add(rowFmt);

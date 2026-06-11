@@ -37,7 +37,11 @@ main() {
   if [[ -f "$esm_zip" ]]; then
     check_zip_lacks "$esm_zip" schemas/gschemas.compiled
     check_zip_has   "$esm_zip" metadata.json
+    check_zip_has   "$esm_zip" extension.js
+    check_zip_has   "$esm_zip" prefs.js
     check_zip_has   "$esm_zip" schemas/org.gnome.shell.extensions.numeric-clock.gschema.xml
+    check_zip_lacks "$esm_zip" tools/build.sh
+    check_zip_lacks "$esm_zip" .env
     local v version_name shellv
     v=$(meta_field "$esm_zip" version)
     version_name=$(python3 -c 'import json,sys,zipfile; print(json.loads(zipfile.ZipFile(sys.argv[1]).read("metadata.json"))["version-name"])' "$esm_zip")

@@ -10,8 +10,8 @@
     "49",
     "50"
   ],
-  "version": 22,
-  "version-name": "17.3.2 45.50",
+  "version": 23,
+  "version-name": "17.3.3 45.50",
   "settings-schema": "org.gnome.shell.extensions.numeric-clock",
   "gettext-domain": "numeric-clock",
   "url": "https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock",
