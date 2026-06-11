@@ -1,5 +1,15 @@
 # Changelog
 
+## v17.3.3 — 2026-06-11
+
+**Security and packaging hardening.**
+
+- Cap format-string length in preferences (128 characters)
+- Release validation asserts `extension.js` and `prefs.js` are present in the zip
+- `only-topbar` remains default `true` (safest; disabling can affect other panel clocks)
+
+> **Recommended upgrade** from v17.3.2 and earlier.
+
 ## End of GNOME Shell 42–44 support — 2026-06-02
 
 **Numeric Clock no longer builds, tests, or maintains a GNOME Shell 42–44 package.**
