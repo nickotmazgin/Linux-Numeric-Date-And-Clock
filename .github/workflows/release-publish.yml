@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: write
-  id-token: write
-  attestations: write
 
 jobs:
   publish:
@@ -57,9 +55,3 @@ jobs:
             gh release create "$TAG" "$ZIP" --title "$TITLE" --notes-file /tmp/release-notes.md
           fi
 
-      - name: Attest release zip (Sigstore)
-        continue-on-error: true
-        uses: actions/attest-build-provenance@v4
-        with:
-          subject-path: ${{ steps.meta.outputs.zip }}
-          push-to-registry: false
