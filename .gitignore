@@ -25,6 +25,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.code-workspace
+.playwright-mcp/
 
 # Caches
 __pycache__/
