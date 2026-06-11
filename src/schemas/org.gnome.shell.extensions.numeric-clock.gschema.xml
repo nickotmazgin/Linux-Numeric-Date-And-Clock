@@ -22,5 +22,10 @@
       <summary>Smooth tick alignment</summary>
       <description>Align the first update to the next second boundary when the interval is 1s.</description>
     </key>
+    <key name="show-panel-icon" type="b">
+      <default>true</default>
+      <summary>Show panel access icon</summary>
+      <description>Display a clock icon in the top bar for quick preferences, presets, and copy-time access.</description>
+    </key>
   </schema>
 </schemalist>

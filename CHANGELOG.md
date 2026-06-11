@@ -1,5 +1,17 @@
 # Changelog
 
+## v17.4.0 — 2026-06-11
+
+**Panel access icon and quick controls.**
+
+- Add a **top-bar clock icon** (`numeric-clock-symbolic`) for fast access to preferences, format presets, and copy-current-time
+- New **Show panel access icon** preference (on by default; hide if you only want the formatted clock text)
+- Fix `shellMajor()` to use the GNOME 45+ `Config` module instead of legacy `imports`
+- Preferences reset now updates all toggle switches correctly
+- README and install docs aligned to extension build **v24**
+
+> **Recommended upgrade** from v17.3.3 and earlier.
+
 ## v17.3.3 — 2026-06-11
 
 **Security and packaging hardening.**

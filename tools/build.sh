@@ -44,6 +44,10 @@ pack_dir() {
     (cd "$tmpdir" && zip -qr "$basezip" .)
   fi
 
+  if [[ -d "$tmpdir/icons" ]] && command -v zip >/dev/null 2>&1; then
+    (cd "$tmpdir" && zip -qr "$basezip" icons/)
+  fi
+
   local dest="$dist/${uuid}.v${version}.shell-extension.zip"
   rm -f "$dest"
   mv -f "$basezip" "$dest"
