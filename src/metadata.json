@@ -10,8 +10,8 @@
     "49",
     "50"
   ],
-  "version": 27,
-  "version-name": "17.4.3 45.50",
+  "version": 28,
+  "version-name": "17.4.4 45.50",
   "icon": "numeric-clock-symbolic",
   "settings-schema": "org.gnome.shell.extensions.numeric-clock",
   "gettext-domain": "numeric-clock",
