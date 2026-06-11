@@ -13,15 +13,15 @@
 [![i18n](https://img.shields.io/badge/i18n-gettext-blue)](#features)
 [![PayPal](https://img.shields.io/badge/Donate-PayPal-0070BA?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW)
 
-A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY** and **24-hour** time with optional **seconds**.
+A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY**, **ISO 8601**, **24-hour**, or **12-hour** time with optional **seconds**, anywhere in the world.
 
-**Latest:** v17.4.0 — ESM build v24 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
+**Latest:** v17.4.1 — ESM build v25 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
 
-> Download only [v17.4.0](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older releases are kept for history and marked superseded.
+> Download only [v17.4.1](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older releases are kept for history and marked superseded.
 
 **UUID:** `numeric-clock@nickotmazgin`
 
-> **Keywords:** GNOME clock · numeric date · DD/MM/YYYY · 24-hour time · seconds · top bar · Israel timezone · Linux desktop · open source
+> **Keywords:** GNOME clock · numeric date · DD/MM/YYYY · ISO 8601 · 24-hour time · international · top bar · Linux desktop · open source
 
 > **GNOME Shell 42–44 is no longer supported.** Numeric Clock requires **GNOME 45–50**.
 
@@ -30,6 +30,8 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 ## Quick links
 
 * **Latest release (ZIPs):** [GitHub Releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
+* **Privacy:** [PRIVACY.md](PRIVACY.md)
+* **Security:** [SECURITY.md](SECURITY.md)
 * **Issues:** [Report a bug](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
 * **Discussions:** [Ask a question](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
 
@@ -44,15 +46,16 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 ## Features
 
 * Fully numeric date/time — you choose the `strftime` **format string**
-* **Israel-friendly defaults:** `DD/MM/YYYY HH:MM:SS` (24-hour, seconds, system timezone e.g. `Asia/Jerusalem`)
+* **International defaults:** `DD/MM/YYYY HH:MM:SS` (24-hour, seconds; uses your **system locale and timezone**)
+* **7 format presets:** International, weekday, compact, time-only, ISO 8601, US 12-hour, top-bar only
 * **Live preview** in settings — ticks every second when format shows seconds
 * Configurable **update interval** (1–300 seconds)
 * **Smooth second tick** alignment when showing seconds
-* Presets: Default, Seconds (with weekday), **DD/MM + seconds** (any timezone)
-* **Panel access icon** — clock icon in the top bar opens a quick menu (preferences, presets, copy time)
+* **Panel access icon** — digital clock icon opens a quick menu (preferences, presets, copy time)
+* **Right-click the formatted clock** for the same quick menu (left-click still opens GNOME calendar)
 * **Restore default clock** when disabled or uninstalled
 * Safe plain-text rendering (no Pango markup)
-* No network access, telemetry, or external services
+* No network access, telemetry, or external services — see [PRIVACY.md](PRIVACY.md)
 
 ---
 
@@ -60,10 +63,12 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 | GNOME | Status | Extension version | Notes |
 | ----- | ------ | ----------------: | ----- |
-| **45–50** | **Supported** | 24 | ESM build; do not ship `schemas/gschemas.compiled` |
+| **45–50** | **Supported** | 25 | ESM build; do not ship `schemas/gschemas.compiled` |
 | **42–44** | **Discontinued** | — | No longer built or maintained |
 
 **Minimum requirement:** GNOME Shell **45**.
+
+Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that ship Shell 45–50.
 
 ---
 
@@ -72,7 +77,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 ### From GitHub release (recommended)
 
 ```bash
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v24.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v25.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 gnome-extensions prefs numeric-clock@nickotmazgin
 ```
@@ -82,7 +87,7 @@ gnome-extensions prefs numeric-clock@nickotmazgin
 ```bash
 ./tools/build.sh
 ./tools/validate.sh
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v24.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v25.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 ```
 
@@ -99,34 +104,50 @@ Open **Preferences** and set:
 * **Format string** — any `strftime` pattern
 * **Update interval (seconds)** — use `1` when showing seconds
 * **Smooth tick** — align updates to second boundaries
-* **Show panel access icon** — top-bar clock icon for quick menu access
+* **Show panel access icon** — digital clock icon for quick menu
+* **Right-click clock for quick menu** — secondary/middle click on the formatted clock
 
 Changes apply immediately as you type.
 
-Click the **clock icon** in the top bar (next to the system tray) for **Open Preferences**, **Copy current time**, and **Quick presets** without opening the full settings window.
+**Quick access:**
 
-### Israel setup (example)
+* Click the **panel clock icon** (system tray area) for preferences, presets, and copy time
+* **Right-click** or **middle-click** the formatted top-bar clock for the same menu
+* **Left-click** the clock still opens the standard GNOME calendar
 
-Set your system timezone to `Asia/Jerusalem`, then use the **Israel** preset or:
+### Regional examples
+
+Numeric Clock uses your **system timezone** — set it in OS Settings. Examples:
+
+**Europe / DD/MM (24-hour):**
 
 ```bash
 gsettings set org.gnome.shell.extensions.numeric-clock format-string '%d/%m/%Y %H:%M:%S'
-gsettings set org.gnome.shell.extensions.numeric-clock update-interval 1
-gsettings set org.gnome.shell.extensions.numeric-clock smooth-second true
-gsettings set org.gnome.shell.extensions.numeric-clock only-topbar true
 ```
 
-Example output: `30/05/2026 18:20:06`
+**ISO 8601 (worldwide standard):**
+
+```bash
+gsettings set org.gnome.shell.extensions.numeric-clock format-string '%Y-%m-%d %H:%M:%S'
+```
+
+**US (12-hour):**
+
+```bash
+gsettings set org.gnome.shell.extensions.numeric-clock format-string '%m/%d/%Y %I:%M:%S %p'
+```
+
+Or use the matching **preset buttons** in Preferences.
 
 ### Quick `strftime` cheatsheet
 
-`%A` weekday · `%a` short weekday · `%d` day · `%m` month · `%Y` year · `%H` hour (00–23) · `%M` minute · `%S` second
+`%A` weekday · `%a` short weekday · `%d` day · `%m` month · `%Y` year · `%H` hour (00–23) · `%I` hour (01–12) · `%p` AM/PM · `%M` minute · `%S` second
 
 Examples:
 
 * `%d/%m/%Y %H:%M:%S` → `30/05/2026 18:20:06`
-* `%A %d/%m/%Y %H:%M:%S` → `Saturday 30/05/2026 18:20:06`
 * `%Y-%m-%d %H:%M:%S` → `2026-05-30 18:20:06`
+* `%m/%d/%Y %I:%M:%S %p` → `05/30/2026 06:20:06 PM`
 
 ---
 
@@ -163,19 +184,23 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 ## Packaging & releases (maintainers)
 
 ```bash
-./tools/build.sh    # -> dist/numeric-clock@nickotmazgin.v24.shell-extension.zip (GNOME 45–50)
+./tools/build.sh    # -> dist/numeric-clock@nickotmazgin.v25.shell-extension.zip (GNOME 45–50)
 ./tools/validate.sh
 ```
 
-Tag `v*.*.*` to trigger CI upload of ZIPs to GitHub Releases.
+Tag `v*` to trigger CI upload of ZIPs to GitHub Releases.
 
 Do **not** commit `schemas/gschemas.compiled` to the repo.
 
 ---
 
-## Privacy
+## Privacy & compliance
 
-No network access. Only local preferences are stored.
+* **Privacy:** [PRIVACY.md](PRIVACY.md) — local-only, no network, no telemetry
+* **Security:** [SECURITY.md](SECURITY.md) — coordinated disclosure
+* **License:** MIT — see [LICENSE](LICENSE)
+
+This extension modifies only the top-bar clock display via supported GNOME Shell APIs. It does not bypass security, escalate privileges, or access data outside your session.
 
 ---
 

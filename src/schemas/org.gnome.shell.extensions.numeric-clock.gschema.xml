@@ -4,7 +4,7 @@
     <key name="format-string" type="s">
       <default>'%d/%m/%Y %H:%M:%S'</default>
       <summary>Clock format</summary>
-      <description>strftime format string for the top bar clock. Uses the system timezone (e.g. Asia/Jerusalem).</description>
+      <description>strftime format string for the top bar clock. Uses your system locale and timezone.</description>
     </key>
     <key name="update-interval" type="i">
       <default>1</default>
@@ -26,6 +26,11 @@
       <default>true</default>
       <summary>Show panel access icon</summary>
       <description>Display a clock icon in the top bar for quick preferences, presets, and copy-time access.</description>
+    </key>
+    <key name="clock-secondary-opens-menu" type="b">
+      <default>true</default>
+      <summary>Right-click clock for quick menu</summary>
+      <description>Right-click or middle-click the formatted top-bar clock to open the Numeric Clock quick menu. Left-click still opens the GNOME calendar.</description>
     </key>
   </schema>
 </schemalist>
