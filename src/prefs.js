@@ -94,6 +94,16 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     rowSmooth.activatable_widget = swSmooth;
     group.add(rowSmooth);
 
+    const rowIcon = new Adw.ActionRow({
+      title: _('Show panel access icon'),
+      subtitle: _('Clock icon in the top bar — click for preferences, presets, and copy time'),
+    });
+    const swIcon = new Gtk.Switch({ active: settings.get_boolean('show-panel-icon') });
+    swIcon.connect('notify::active', w => settings.set_boolean('show-panel-icon', w.active));
+    rowIcon.add_suffix(swIcon);
+    rowIcon.activatable_widget = swIcon;
+    group.add(rowIcon);
+
     const rowPresets = new Adw.ActionRow({
       title: _('Presets'),
       subtitle: _('Quick formats for any timezone — uses your system clock (e.g. Asia/Jerusalem)'),
@@ -130,9 +140,13 @@ export default class NumericClockPrefs extends ExtensionPreferences {
         settings.reset('update-interval');
         settings.reset('smooth-second');
         settings.reset('only-topbar');
+        settings.reset('show-panel-icon');
         entry.text = settings.get_string('format-string');
         if (typeof spin.set_value === 'function')
           spin.set_value(settings.get_int('update-interval'));
+        swOnly.active = settings.get_boolean('only-topbar');
+        swSmooth.active = settings.get_boolean('smooth-second');
+        swIcon.active = settings.get_boolean('show-panel-icon');
         refreshPreview();
       } catch (_) {}
     });

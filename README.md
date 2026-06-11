@@ -15,9 +15,9 @@
 
 A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY** and **24-hour** time with optional **seconds**.
 
-**Latest:** v17.3.3 — ESM build v23 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
+**Latest:** v17.4.0 — ESM build v24 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
 
-> Download only [v17.3.3](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older releases are kept for history.
+> Download only [v17.4.0](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older releases are kept for history and marked superseded.
 
 **UUID:** `numeric-clock@nickotmazgin`
 
@@ -49,6 +49,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 * Configurable **update interval** (1–300 seconds)
 * **Smooth second tick** alignment when showing seconds
 * Presets: Default, Seconds (with weekday), **DD/MM + seconds** (any timezone)
+* **Panel access icon** — clock icon in the top bar opens a quick menu (preferences, presets, copy time)
 * **Restore default clock** when disabled or uninstalled
 * Safe plain-text rendering (no Pango markup)
 * No network access, telemetry, or external services
@@ -59,7 +60,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 | GNOME | Status | Extension version | Notes |
 | ----- | ------ | ----------------: | ----- |
-| **45–50** | **Supported** | 22 | ESM build; do not ship `schemas/gschemas.compiled` |
+| **45–50** | **Supported** | 24 | ESM build; do not ship `schemas/gschemas.compiled` |
 | **42–44** | **Discontinued** | — | No longer built or maintained |
 
 **Minimum requirement:** GNOME Shell **45**.
@@ -71,7 +72,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 ### From GitHub release (recommended)
 
 ```bash
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v22.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v24.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 gnome-extensions prefs numeric-clock@nickotmazgin
 ```
@@ -81,7 +82,7 @@ gnome-extensions prefs numeric-clock@nickotmazgin
 ```bash
 ./tools/build.sh
 ./tools/validate.sh
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v22.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v24.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 ```
 
@@ -98,8 +99,11 @@ Open **Preferences** and set:
 * **Format string** — any `strftime` pattern
 * **Update interval (seconds)** — use `1` when showing seconds
 * **Smooth tick** — align updates to second boundaries
+* **Show panel access icon** — top-bar clock icon for quick menu access
 
 Changes apply immediately as you type.
+
+Click the **clock icon** in the top bar (next to the system tray) for **Open Preferences**, **Copy current time**, and **Quick presets** without opening the full settings window.
 
 ### Israel setup (example)
 
@@ -159,7 +163,7 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 ## Packaging & releases (maintainers)
 
 ```bash
-./tools/build.sh    # -> dist/numeric-clock@nickotmazgin.v22.shell-extension.zip (GNOME 45–50)
+./tools/build.sh    # -> dist/numeric-clock@nickotmazgin.v24.shell-extension.zip (GNOME 45–50)
 ./tools/validate.sh
 ```
 

@@ -2,8 +2,12 @@
 // Numeric Clock — GNOME 45+ (ESM)
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
 import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 const HOOKED = Symbol('nc-hooked');
@@ -37,7 +41,6 @@ function allStageLabels() {
 
 function shellMajor() {
   try {
-    const Config = imports.misc.config;
     const ver = Config.PACKAGE_VERSION || '';
     const major = parseInt(String(ver).split('.')[0], 10);
     if (Number.isFinite(major) && major > 0)
@@ -65,10 +68,127 @@ function disconnectStageSignal(stage, id) {
   try { stage.disconnect(id); } catch {}
 }
 
+function copyTextToClipboard(text) {
+  try {
+    St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, String(text || ''));
+    Main.notify('Numeric Clock', 'Time copied to clipboard');
+  } catch (e) {
+    console.error('[Numeric Clock] clipboard error:', e);
+  }
+}
+
+const NumericClockIndicator = GObject.registerClass(
+class NumericClockIndicator extends PanelMenu.Button {
+  _init(settings, extensionPath, openPrefs) {
+    super._init(0.0, 'Numeric Clock');
+    this._settings = settings;
+    this._openPrefs = openPrefs;
+    this._timeLabel = null;
+    this._menuTimerId = 0;
+
+    const iconPath = GLib.build_filenamev([extensionPath, 'icons', 'numeric-clock-symbolic.svg']);
+    const icon = new St.Icon({
+      gicon: Gio.Icon.new_for_string(iconPath),
+      style_class: 'system-status-icon numeric-clock-icon',
+    });
+    this.add_child(icon);
+    this._buildMenu();
+
+    this._settingsChangedIds = [
+      this._settings.connect('changed::format-string', () => this._refreshMenuTime()),
+      this._settings.connect('changed::show-panel-icon', () => this._syncVisibility()),
+    ];
+    this._syncVisibility();
+  }
+
+  destroy() {
+    this._clearMenuTimer();
+    for (const id of this._settingsChangedIds || []) {
+      try { this._settings.disconnect(id); } catch {}
+    }
+    this._settingsChangedIds = [];
+    super.destroy();
+  }
+
+  _syncVisibility() {
+    const show = this._settings.get_boolean('show-panel-icon');
+    this.visible = show;
+  }
+
+  _clearMenuTimer() {
+    if (this._menuTimerId) {
+      GLib.source_remove(this._menuTimerId);
+      this._menuTimerId = 0;
+    }
+  }
+
+  _refreshMenuTime() {
+    if (!this._timeLabel?.label) return;
+    this._timeLabel.label.text = formatNow(this._settings.get_string('format-string'));
+  }
+
+  _startMenuTimer() {
+    this._clearMenuTimer();
+    this._refreshMenuTime();
+    this._menuTimerId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 1, () => {
+      this._refreshMenuTime();
+      return GLib.SOURCE_CONTINUE;
+    });
+  }
+
+  _applyPreset(fmt, interval, smooth, onlyTopbar) {
+    this._settings.set_string('format-string', fmt);
+    this._settings.set_int('update-interval', interval);
+    this._settings.set_boolean('smooth-second', smooth);
+    if (onlyTopbar !== undefined)
+      this._settings.set_boolean('only-topbar', onlyTopbar);
+    this._refreshMenuTime();
+    Main.notify('Numeric Clock', 'Format preset applied');
+  }
+
+  _buildMenu() {
+    this.menu.removeAll();
+    this._timeLabel = new PopupMenu.PopupMenuItem('', { reactive: false, can_focus: false });
+    this._timeLabel.label.clutter_text.ellipsize = 3;
+    this.menu.addMenuItem(this._timeLabel);
+
+    this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+    const prefsItem = new PopupMenu.PopupMenuItem('Open Preferences');
+    prefsItem.connect('activate', () => this._openPrefs());
+    this.menu.addMenuItem(prefsItem);
+
+    const copyItem = new PopupMenu.PopupMenuItem('Copy current time');
+    copyItem.connect('activate', () => {
+      copyTextToClipboard(formatNow(this._settings.get_string('format-string')));
+    });
+    this.menu.addMenuItem(copyItem);
+
+    const presets = new PopupMenu.PopupSubMenuMenuItem('Quick presets');
+    const addPreset = (label, fmt, interval, smooth, onlyTopbar) => {
+      const item = new PopupMenu.PopupMenuItem(label);
+      item.connect('activate', () => this._applyPreset(fmt, interval, smooth, onlyTopbar));
+      presets.menu.addMenuItem(item);
+    };
+    addPreset('Default (DD/MM/YYYY + seconds)', '%d/%m/%Y %H:%M:%S', 1, true);
+    addPreset('Weekday + seconds', '%A %d/%m/%Y %H:%M:%S', 1, true);
+    addPreset('Top bar only (DD/MM + seconds)', '%d/%m/%Y %H:%M:%S', 1, true, true);
+    this.menu.addMenuItem(presets);
+
+    this.menu.connect('open-state-changed', (_menu, open) => {
+      if (open)
+        this._startMenuTimer();
+      else
+        this._clearMenuTimer();
+    });
+  }
+});
+
 export default class NumericClockExtension extends Extension {
   constructor(uuid) {
     super(uuid);
     this._settings = null;
+    this._indicator = null;
     this._timeoutId = 0;
     this._msTimeoutId = 0;
     this._stageAddedId = 0;
@@ -162,19 +282,41 @@ export default class NumericClockExtension extends Extension {
     }
   }
 
+  _syncIndicator() {
+    if (!this._indicator) return;
+    const show = this._settings.get_boolean('show-panel-icon');
+    this._indicator.visible = show;
+  }
+
   enable() {
     this._settings = this.getSettings();
+
+    this._indicator = new NumericClockIndicator(
+      this._settings,
+      this.path,
+      () => this.openPreferences(),
+    );
+    Main.panel.addToStatusArea('numeric-clock-access', this._indicator, 1, 'right');
 
     this._settingsChangedIds.push(
       this._settings.connect('changed::format-string', () => this._updateAllNow()),
       this._settings.connect('changed::update-interval', () => this._restartTimer()),
+      this._settings.connect('changed::smooth-second', () => this._restartTimer()),
+      this._settings.connect('changed::only-topbar', () => this._updateAllNow()),
+      this._settings.connect('changed::show-panel-icon', () => this._syncIndicator()),
     );
     this._stageAddedId = connectStageSignal(global.stage, 'added', () => this._updateAllNow());
     this._stageRemovedId = connectStageSignal(global.stage, 'removed', () => this._updateAllNow());
     this._restartTimer();
+    this._syncIndicator();
   }
 
   disable() {
+    if (this._indicator) {
+      this._indicator.destroy();
+      this._indicator = null;
+    }
+
     if (this._timeoutId) GLib.source_remove(this._timeoutId);
     this._timeoutId = 0;
     if (this._msTimeoutId) GLib.source_remove(this._msTimeoutId);
