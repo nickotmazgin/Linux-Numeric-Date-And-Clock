@@ -37,9 +37,38 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 ---
 
-## Screenshot
+## Screenshots
 
-![Numeric Clock — top bar, settings, and about (2026)](screenshots/collage-2026.png)
+*Numeric Clock v17.4.4 — click any image to view it full size.*
+
+[![Numeric Clock v17.4.4 collage](screenshots/collage.jpg)](screenshots/collage.jpg)
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="screenshots/c1.jpg"><img src="screenshots/c1.jpg" width="260" alt="c1 — Panel icon menu"></a><br>
+      <b>c1</b> — Panel icon menu
+    </td>
+    <td align="center">
+      <a href="screenshots/c2.jpg"><img src="screenshots/c2.jpg" width="260" alt="c2 — Quick presets"></a><br>
+      <b>c2</b> — Quick presets
+    </td>
+    <td align="center">
+      <a href="screenshots/c3.jpg"><img src="screenshots/c3.jpg" width="260" alt="c3 — Preferences · Settings"></a><br>
+      <b>c3</b> — Preferences · Settings
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="screenshots/c4.jpg"><img src="screenshots/c4.jpg" width="260" alt="c4 — Format presets"></a><br>
+      <b>c4</b> — Format presets
+    </td>
+    <td align="center">
+      <a href="screenshots/c5.jpg"><img src="screenshots/c5.jpg" width="260" alt="c5 — About"></a><br>
+      <b>c5</b> — About
+    </td>
+  </tr>
+</table>
 
 ---
 
