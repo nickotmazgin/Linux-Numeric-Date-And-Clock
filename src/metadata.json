@@ -1,6 +1,6 @@
 {
   "name": "Numeric Clock",
-  "description": "Top-bar clock with a numeric DD/MM/YYYY 24-hour format. GNOME Shell 45–50.",
+  "description": "Top-bar numeric DD/MM/YYYY 24-hour clock. GNOME Shell 45–50. X11/Xorg validated on maintainer setup; Wayland supported.",
   "uuid": "numeric-clock@nickotmazgin",
   "shell-version": [
     "45",

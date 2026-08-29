@@ -11,6 +11,8 @@ We maintain security fixes for the currently released builds of Numeric Clock:
 
 GNOME Shell **42–44** support has ended. Upgrade to GNOME **45** or newer.
 
+**Platforms:** GNOME Shell **45–50** on **Wayland** (supported) and **X11/Xorg** (supported; **v17.4.4 validated** on maintainer X11 setup).
+
 ## Reporting a vulnerability
 
 **Please do not open a public issue.**
@@ -24,7 +26,7 @@ Include, if possible:
 
 * A clear description and impact
 * Steps to reproduce
-* Affected GNOME Shell version(s) and OS
+* Affected GNOME Shell version(s), **session type** (Wayland / X11 / Xorg), and OS
 * Relevant logs (e.g. `journalctl --user -b 0 -o cat | grep -i numeric-clock`)
 ## Response & disclosure timeline
 
@@ -50,10 +52,4 @@ We will not pursue legal action against good-faith research and reporting that:
 
 If in doubt, contact us first.
 
----
-
-* ➕ **CODEOWNERS**
-
-  ```
-  * @nickotmazgin
-  ```
+See also [.github/CODEOWNERS](.github/CODEOWNERS).

@@ -6,22 +6,22 @@
 [![License: MIT](https://img.shields.io/github/license/nickotmazgin/Linux-Numeric-Date-And-Clock)](LICENSE)
 [![GNOME 45–50](https://img.shields.io/badge/GNOME-45%E2%80%9350-4A86CF?logo=gnome&logoColor=white)](#compatibility)
 [![ESM](https://img.shields.io/badge/ESM-GJS%20modules-orange)](#compatibility)
-[![Wayland](https://img.shields.io/badge/Wayland-ready-0078D4)](#compatibility)
+[![Wayland](https://img.shields.io/badge/Wayland-supported-0078D4)](#compatibility)
+[![X11 / Xorg](https://img.shields.io/badge/X11%20%2F%20Xorg-validated-555555)](#compatibility)
 
 [![Issues](https://img.shields.io/github/issues/nickotmazgin/Linux-Numeric-Date-And-Clock)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
 [![Discussions](https://img.shields.io/github/discussions/nickotmazgin/Linux-Numeric-Date-And-Clock?label=discussions&color=8B5CF6)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
 [![i18n](https://img.shields.io/badge/i18n-gettext-blue)](#features)
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-0070BA?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW)
 
 A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY**, **ISO 8601**, **24-hour**, or **12-hour** time with optional **seconds**, anywhere in the world.
 
-**Latest:** v17.4.4 — ESM build v28 for **GNOME 45–50** (Shell 46 tested on Zorin OS 18.1)
+**Latest:** v17.4.4 — ESM build v28 for **GNOME 45–50** (**X11/Xorg validated** on Zorin OS 18.1 / GNOME Shell 46)
 
-> Download only [v17.4.4](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older stable releases (v17.3.x) are kept for rollback.
+> Download only [v17.4.4](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older stable releases (v17.3.x) are kept for rollback. **No new extension release is required** for docs/CI-only updates on `main` since v17.4.4.
 
 **UUID:** `numeric-clock@nickotmazgin`
 
-> **Keywords:** GNOME clock · numeric date · DD/MM/YYYY · ISO 8601 · 24-hour time · international · top bar · Linux desktop · open source
+> **Keywords:** GNOME clock · numeric date · DD/MM/YYYY · ISO 8601 · 24-hour time · Wayland · X11 · Xorg · top bar · Linux desktop · open source
 
 > **GNOME Shell 42–44 is no longer supported.** Numeric Clock requires **GNOME 45–50**.
 
@@ -95,7 +95,14 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 | **45–50** | **Supported** | 28 | ESM build; do not ship `schemas/gschemas.compiled` |
 | **42–44** | **Discontinued** | — | No longer built or maintained |
 
-**Minimum requirement:** GNOME Shell **45**.
+| Session | Status | Notes |
+| ------- | ------ | ----- |
+| **X11 / Xorg** | **Supported · validated** | **v17.4.4** runtime-tested on Zorin OS 18.1 / GNOME Shell 46 / X11 |
+| **Wayland** | **Supported** | Works by design; not maintainer runtime-tested for v17.4.4 |
+
+**Minimum requirement:** GNOME Shell **45** on a **Wayland or X11/Xorg** session.
+
+> **Validation scope (v17.4.4):** maintainer confidence is highest on **X11/Xorg** (local Zorin setup). Older release notes were not retroactively re-labeled.
 
 Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that ship Shell 45–50.
 
@@ -271,7 +278,7 @@ Every AI-assisted change is human-reviewed, tested on real GNOME sessions, and a
 
 ## Find this project
 
-**GitHub topics:** `gnome-shell-extension` · `clock` · `24-hour` · `numeric-date` · `top-bar` · `seconds` · `wayland` · `linux` · `open-source`
+**GitHub topics:** `gnome-shell-extension` · `clock` · `24-hour` · `numeric-date` · `top-bar` · `seconds` · `wayland` · `x11` · `xorg` · `linux` · `open-source`
 
 **Search for:** GNOME numeric clock, Linux top bar date format, DD/MM/YYYY clock extension, 24 hour clock GNOME
 

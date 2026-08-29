@@ -13,7 +13,17 @@ body:
     id: shell
     attributes:
       label: GNOME Shell version
-      placeholder: e.g., 45.4 (Wayland)
+      placeholder: e.g., 46.0
+    validations:
+      required: true
+  - type: dropdown
+    id: session
+    attributes:
+      label: Session type
+      options:
+        - X11 / Xorg
+        - Wayland
+        - Unknown
     validations:
       required: true
   - type: dropdown
