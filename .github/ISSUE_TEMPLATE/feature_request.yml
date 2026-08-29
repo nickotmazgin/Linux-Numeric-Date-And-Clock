@@ -16,3 +16,11 @@ body:
     id: alternatives
     attributes:
       label: Alternatives considered
+  - type: dropdown
+    id: session
+    attributes:
+      label: Session type (if relevant)
+      options:
+        - X11 / Xorg
+        - Wayland
+        - Not sure / N/A
