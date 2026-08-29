@@ -10,16 +10,27 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CHANGELOG = REPO_ROOT / "CHANGELOG.md"
 
 FOOTER = """
+## Compatibility
+
+- **GNOME Shell 45–50** — Wayland and X11/Xorg session types supported
+- **Maintainer runtime-tested (when noted in changelog):** X11/Xorg only unless a release explicitly states otherwise
+
 ## Install
+
 Download **`numeric-clock@nickotmazgin.v*.shell-extension.zip`** from this release (GNOME Shell **45–50**), then:
 
 ```bash
 gnome-extensions install --force numeric-clock@nickotmazgin.v*.shell-extension.zip
+gnome-extensions enable numeric-clock@nickotmazgin
 ```
 
-Enable in Extensions, or Alt+F2 → r → Enter after install.
+Restart GNOME Shell after install:
+
+- **Wayland:** log out and back in
+- **X11 / Xorg:** `Alt+F2` → `r` → Enter
 
 ## GNOME 42–44 — discontinued
+
 Numeric Clock **no longer supports GNOME Shell 42–44**. Use GNOME **45** or newer.
 """.strip()
 

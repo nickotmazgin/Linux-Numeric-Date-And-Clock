@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased (main)
+
+**Repository maintenance — no extension code changes since v17.4.4.**
+
+- README: X11/Xorg-validated vs Wayland-supported badges and compatibility table
+- Security policy, bug template, and release-note footer aligned with session validation scope
+- CI dependency bumps (CodeQL 4.37.8, actions/checkout pin) — already on `main`
+- Docs/screenshots refresh (#50–#51) — already on `main`
+
+> **No new GitHub release required** unless extension code or metadata version bumps.
+
 ## v17.4.4 — 2026-06-11
 
 **Fix extension enable crash on GNOME Shell 46.**
