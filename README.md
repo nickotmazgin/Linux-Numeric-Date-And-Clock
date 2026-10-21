@@ -263,7 +263,6 @@ MIT © Nick Otmazgin — see [LICENSE](LICENSE).
 Numeric Clock is created, maintained, signed, and released by **[Nick Otmazgin](https://github.com/nickotmazgin)** — the project's sole administrator and solo developer, who authors and reviews all code that ships.
 
 [![AI assisted — OpenAI Codex](https://img.shields.io/badge/AI%20assisted-OpenAI%20Codex-10A37F)](https://openai.com/codex/)
-[![AI assisted — Cursor Agent](https://img.shields.io/badge/AI%20assisted-Cursor%20Agent-1A1A1A)](https://cursor.com)
 
 Recent releases were built with help from AI pair-programming agents, operated under the maintainer's direction and review:
 
