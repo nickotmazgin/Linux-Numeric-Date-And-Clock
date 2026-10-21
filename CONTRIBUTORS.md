@@ -13,7 +13,7 @@ Recent releases were developed with help from AI pair-programming agents. As the
 | Assistant | Role |
 |-----------|------|
 | **[OpenAI Codex](https://openai.com/codex/)** | Release engineering, signed-tag release workflows, release validation and CI hardening |
-| **[Cursor (Agent)](https://cursor.com)** | Code review, debugging, documentation |
+| **Cursor (Agent)** | Code review, debugging, documentation |
 
 ## Community
 
