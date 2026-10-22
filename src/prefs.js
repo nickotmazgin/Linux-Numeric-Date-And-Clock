@@ -77,8 +77,16 @@ export default class NumericClockPrefs extends ExtensionPreferences {
       description: _('Uses your system locale and timezone'),
     });
 
-    const rowFmt = new Adw.EntryRow({ title: _('Format string') });
-    settings.bind('format-string', rowFmt, 'text', Gio.SettingsBindFlags.DEFAULT);
+    // Edits are saved only on Enter or the apply button, so a stray key press
+    // (Preferences can open straight from a panel click) never changes the clock.
+    const rowFmt = new Adw.EntryRow({ title: _('Format string'), show_apply_button: true });
+    const showSaved = () => {
+      // Setting text programmatically would otherwise reveal the apply button.
+      rowFmt.show_apply_button = false;
+      rowFmt.text = settings.get_string('format-string');
+      rowFmt.show_apply_button = true;
+    };
+    showSaved();
     groupFormat.add(rowFmt);
 
     const rowPreview = new Adw.ActionRow({ title: _('Preview') });
@@ -89,14 +97,20 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     // Live sample shown as each preset row's subtitle.
     const presetRows = [];
     let previewTimer = 0;
+    // The preview follows what is typed; the clock changes once it is applied.
     const refreshPreview = () => {
-      const fmt = settings.get_string('format-string');
+      const fmt = rowFmt.text;
       const valid = isValidFormat(fmt);
       preview.label = formatNow(fmt);
-      rowPreview.subtitle = valid
-        ? _('Live sample')
-        : _('Invalid or empty format — the clock shows the default format');
-      if (valid) rowFmt.remove_css_class('error');
+      if (!valid)
+        rowPreview.subtitle = _('Invalid or empty format — it will not be saved');
+      else if (!fmt.includes('%'))
+        rowPreview.subtitle = _('No % codes — the clock would show this text as it is');
+      else if (fmt !== settings.get_string('format-string'))
+        rowPreview.subtitle = _('Press Enter or ✓ to apply');
+      else
+        rowPreview.subtitle = _('Live sample');
+      if (valid && fmt.includes('%')) rowFmt.remove_css_class('error');
       else rowFmt.add_css_class('error');
       for (const [row, preset] of presetRows)
         row.subtitle = `${preset.fmt}  →  ${formatNow(preset.fmt)}`;
@@ -233,13 +247,28 @@ export default class NumericClockPrefs extends ExtensionPreferences {
     window.add(pageSettings);
     window.add(pageAbout);
 
-    // Trim over-long formats; settings.bind() writes the trimmed text back.
     rowFmt.connect('changed', () => {
       if (rowFmt.text.length > MAX_FORMAT_LENGTH)
         rowFmt.text = rowFmt.text.slice(0, MAX_FORMAT_LENGTH);
+      refreshPreview();
     });
+    rowFmt.connect('apply', () => {
+      const fmt = rowFmt.text.trim();
+      if (isValidFormat(fmt) && fmt.includes('%'))
+        settings.set_string('format-string', fmt);
+      else
+        refreshPreview();
+    });
+    // Open with nothing focused, so typing does not land in the format field.
+    window.connect('map', () => GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+      window.set_focus(null);
+      return GLib.SOURCE_REMOVE;
+    }));
     const settingsIds = [
-      settings.connect('changed::format-string', restartPreviewTimer),
+      settings.connect('changed::format-string', () => {
+        showSaved();
+        restartPreviewTimer();
+      }),
       settings.connect('changed::update-interval', restartPreviewTimer),
     ];
     restartPreviewTimer();

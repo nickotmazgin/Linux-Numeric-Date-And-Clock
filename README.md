@@ -18,11 +18,11 @@ A lightweight **GNOME Shell extension** that turns the top-bar clock into a **nu
 
 Stock GNOME shows `Oct 22  13:17` and offers no date-format setting. Numeric Clock shows `22/10/2026 13:17:05` (or whatever you choose), ticks exactly on the second, and puts the stock clock back the moment you disable it.
 
-**Latest:** v17.6.0 — ESM build v30 for **GNOME 45–51** (**X11/Xorg validated** on Zorin OS 18.1 / GNOME Shell 46)
+**Latest:** v17.6.1 — ESM build v31 for **GNOME 45–51** (**X11/Xorg validated** on Zorin OS 18.1 / GNOME Shell 46)
 
 > **Demo:** [watch the 82-second tour](#demo-video) · [announcement](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/76)
 
-> Download [v17.6.0](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older stable releases are kept for rollback. See [CHANGELOG.md](CHANGELOG.md) for what changed.
+> Download [v17.6.1](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older stable releases are kept for rollback. See [CHANGELOG.md](CHANGELOG.md) for what changed.
 
 **UUID:** `numeric-clock@nickotmazgin`
 
@@ -135,17 +135,17 @@ https://github.com/user-attachments/assets/ed9d6851-2878-4a63-8c46-d8a2bbcb1d06
 
 | GNOME | Status | Extension version | Notes |
 | ----- | ------ | ----------------: | ----- |
-| **45–51** | **Supported** | 30 | ESM build; do not ship `schemas/gschemas.compiled` |
+| **45–51** | **Supported** | 31 | ESM build; do not ship `schemas/gschemas.compiled` |
 | **42–44** | **Discontinued** | — | No longer built or maintained |
 
 | Session | Status | Notes |
 | ------- | ------ | ----- |
 | **X11 / Xorg** | **Supported · validated** | Runtime-tested on Zorin OS 18.1 / GNOME Shell 46 / X11 |
-| **Wayland** | **Supported** | **v17.6.0** passes the nested GNOME Shell (Wayland) smoke test |
+| **Wayland** | **Supported** | **v17.6.1** passes the nested GNOME Shell (Wayland) smoke test |
 
 **Minimum requirement:** GNOME Shell **45** on a **Wayland or X11/Xorg** session.
 
-> **Validation scope (v17.6.0):** runtime-tested on GNOME Shell 46 (X11 desktop and a nested Wayland shell via `tools/nested-smoke-test.sh`). GNOME 47–51 support follows the official porting guides; Numeric Clock uses none of the APIs they removed.
+> **Validation scope (v17.6.1):** runtime-tested on GNOME Shell 46 (X11 desktop and a nested Wayland shell via `tools/nested-smoke-test.sh`). GNOME 47–51 support follows the official porting guides; Numeric Clock uses none of the APIs they removed.
 
 Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that ship Shell 45–51.
 
@@ -155,10 +155,10 @@ Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that 
 
 ### From GitHub release (recommended)
 
-Download **`numeric-clock@nickotmazgin.v30.shell-extension.zip`** from the [latest release](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest) (or `gh release download -R nickotmazgin/Linux-Numeric-Date-And-Clock`), then:
+Download **`numeric-clock@nickotmazgin.v31.shell-extension.zip`** from the [latest release](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest) (or `gh release download -R nickotmazgin/Linux-Numeric-Date-And-Clock`), then:
 
 ```bash
-gnome-extensions install --force numeric-clock@nickotmazgin.v30.shell-extension.zip
+gnome-extensions install --force numeric-clock@nickotmazgin.v31.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 gnome-extensions prefs numeric-clock@nickotmazgin
 ```
@@ -168,7 +168,7 @@ gnome-extensions prefs numeric-clock@nickotmazgin
 ```bash
 ./tools/build.sh
 ./tools/validate.sh
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v30.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v31.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 ```
 
@@ -191,7 +191,7 @@ Open **Preferences** and set:
 * **Panel icon clicks** — choose what right-click and middle-click do (quick menu, Preferences, copy time)
 * **Right-click clock for quick menu** — secondary/middle click on the formatted clock
 
-Changes apply immediately as you type.
+Settings apply immediately. The **format string** is saved when you press **Enter** (or the ✓ button), so a stray key press never changes your clock; the preview shows what you type before you apply it.
 
 **Quick access:**
 
@@ -296,9 +296,10 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 ## Packaging & releases (maintainers)
 
 ```bash
-./tools/build.sh                # -> dist/numeric-clock@nickotmazgin.v30.shell-extension.zip (GNOME 45–51)
+./tools/build.sh                # -> dist/numeric-clock@nickotmazgin.v31.shell-extension.zip (GNOME 45–51)
 ./tools/validate.sh
 ./tools/nested-smoke-test.sh    # isolated nested GNOME Shell run; prints PASSED/FAILED
+./tools/prefs-test.sh           # Preferences behaviour in plain gjs
 python3 tools/media/demo_video.py  # narrated 1080p demo video (tools/media/README.md)
 npx -y eslint@9 .               # lint (same as CI)
 ```

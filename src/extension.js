@@ -318,7 +318,12 @@ export default class NumericClockExtension extends Extension {
     this._indicator = new NumericClockIndicator(
       this._settings,
       this.path,
-      () => this.openPreferences(),
+      () => {
+        // openPreferences() returns a promise on GNOME 45+; it rejects when the
+        // Extensions app cannot be reached.
+        Promise.resolve(this.openPreferences())
+          .catch(e => console.warn(`[Numeric Clock] could not open Preferences: ${e.message}`));
+      },
     );
     Main.panel.addToStatusArea('numeric-clock-access', this._indicator, 1, 'right');
 
