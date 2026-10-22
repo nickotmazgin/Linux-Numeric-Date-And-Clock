@@ -1,5 +1,15 @@
 # Changelog
 
+## v17.6.0 — 2026-10-22
+
+**Menu styles and distinct panel icon clicks.**
+
+- **Menu style: System, Light or Dark** — in Preferences → Appearance or straight from the quick menu. System follows the shell theme; Light and Dark use Numeric Clock's own colors for the menu and tooltip
+- **Panel icon clicks do different things:** left-click opens the quick menu, **right-click opens Preferences**, **middle-click copies the current time**. Right- and middle-click are configurable (quick menu, Preferences, copy time); the tooltip shows the hints
+- Right-clicking the top-bar clock now opens the quick menu under the clock instead of under the icon
+- Gallery redone from a real GNOME Shell session with descriptive file names (tray menu, presets, menu styles, clock menu, tooltip, copy, Preferences); new collage and a more readable social preview
+- Nested smoke test covers click actions and menu styles (31 checks)
+
 ## v17.5.0 — 2026-10-22
 
 **GNOME Shell 51 support, a sharper icon, and an audit of the clock engine.**

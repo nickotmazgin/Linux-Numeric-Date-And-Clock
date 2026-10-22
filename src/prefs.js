@@ -17,7 +17,9 @@ const AUTHOR = 'Nick Otmazgin';
 const SETTING_KEYS = [
   'format-string', 'update-interval', 'only-topbar', 'smooth-second',
   'show-panel-icon', 'clock-secondary-opens-menu',
+  'menu-style', 'icon-right-click', 'icon-middle-click',
 ];
+const CLICK_ACTIONS = [['menu', 'Open quick menu'], ['preferences', 'Open Preferences'], ['copy', 'Copy current time']];
 const CHEATSHEET = [
   ['%d / %m / %Y', 'Day · month · year (22 / 10 / 2026)'],
   ['%H : %M : %S', '24-hour time (13:05:09)'],
@@ -36,6 +38,23 @@ function launchUri(uri) {
 function switchRow(settings, key, title, subtitle) {
   const row = new Adw.SwitchRow({ title, subtitle });
   settings.bind(key, row, 'active', Gio.SettingsBindFlags.DEFAULT);
+  return row;
+}
+
+// Combo row for a string key with <choices>; choices are [value, label] pairs.
+function comboRow(settings, key, title, subtitle, choices) {
+  const row = new Adw.ComboRow({
+    title, subtitle,
+    model: Gtk.StringList.new(choices.map(([, label]) => _(label))),
+  });
+  const sync = () => {
+    const i = choices.findIndex(([value]) => value === settings.get_string(key));
+    if (i >= 0 && row.selected !== i) row.selected = i;
+  };
+  sync();
+  row.connect('notify::selected', () => settings.set_string(key, choices[row.selected][0]));
+  const id = settings.connect(`changed::${key}`, sync);
+  row.connect('destroy', () => settings.disconnect(id));
   return row;
 }
 
@@ -122,6 +141,12 @@ export default class NumericClockPrefs extends ExtensionPreferences {
       _('Recommended. When off, other panel and dock clocks are formatted too.')));
     pageSettings.add(groupBehavior);
 
+    const groupLook = new Adw.PreferencesGroup({ title: _('Appearance') });
+    groupLook.add(comboRow(settings, 'menu-style', _('Menu style'),
+      _('Quick menu and tooltip colors. System follows the shell theme.'),
+      [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']]));
+    pageSettings.add(groupLook);
+
     const groupAccess = new Adw.PreferencesGroup({ title: _('Quick access') });
     groupAccess.add(switchRow(settings, 'show-panel-icon',
       _('Show panel icon'),
@@ -130,6 +155,14 @@ export default class NumericClockPrefs extends ExtensionPreferences {
       _('Right-click clock for quick menu'),
       _('Right-click or middle-click the clock. Left-click still opens the GNOME calendar.')));
     pageSettings.add(groupAccess);
+
+    const groupClicks = new Adw.PreferencesGroup({
+      title: _('Panel icon clicks'),
+      description: _('Left-click always opens the quick menu'),
+    });
+    groupClicks.add(comboRow(settings, 'icon-right-click', _('Right-click'), null, CLICK_ACTIONS));
+    groupClicks.add(comboRow(settings, 'icon-middle-click', _('Middle-click'), null, CLICK_ACTIONS));
+    pageSettings.add(groupClicks);
 
     const groupPresets = new Adw.PreferencesGroup({
       title: _('Format presets'),

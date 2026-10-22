@@ -19,6 +19,9 @@ const CLOCK_NAME_RE = /(^|[-_\s])clock([-_\s]|$)/i;
 const CLOCK_TEXT_RE = /^[\p{L}\p{N}\s,./-]{0,24}?\d{1,2}\u200e?[:\u2236]\d{2}(\u200e?[:\u2236]\d{2})?(\s?[ap]\.?m\.?)?$/iu;
 // When not limited to the top bar, look for new clock labels every few ticks.
 const RESCAN_TICKS = 5;
+const MENU_STYLES = ['system', 'light', 'dark'];
+const STYLE_LABELS = { system: 'System', light: 'Light', dark: 'Dark' };
+const ACTION_LABELS = { menu: 'quick menu', preferences: 'preferences', copy: 'copy time' };
 
 function looksLikeClock(lab) {
   const cls = lab.get_style_class_name?.() || '';
@@ -79,6 +82,7 @@ class Tooltip {
     this._textFn = textFn;
     this._label = null;
     this._timeoutId = 0;
+    this.styleClass = '';
     actor.connect('notify::hover', () => (actor.hover ? this._schedule() : this.hide()));
     actor.connect('button-press-event', () => {
       this.hide();
@@ -99,7 +103,7 @@ class Tooltip {
     const actor = this._actor;
     if (!actor.mapped || actor.menu?.isOpen)
       return;
-    this._label = new St.Label({ style_class: 'dash-label numeric-clock-tooltip', text: this._textFn() });
+    this._label = new St.Label({ style_class: `dash-label numeric-clock-tooltip ${this.styleClass}`, text: this._textFn() });
     Main.uiGroup.add_child(this._label);
     const [x, y] = actor.get_transformed_position();
     const [w, h] = actor.get_transformed_size();
@@ -141,15 +145,66 @@ class NumericClockIndicator extends PanelMenu.Button {
       style_class: 'system-status-icon numeric-clock-icon',
     });
     this.add_child(icon);
-    this._tooltip = new Tooltip(this,
-      () => `${_('Numeric Clock')} — ${formatNow(this._settings.get_string('format-string'))}`);
+    this._tooltip = new Tooltip(this, () => this._tooltipText());
     this._buildMenu();
 
     this._settingsChangedIds = [
       this._settings.connect('changed::format-string', () => this._refreshMenuTime()),
       this._settings.connect('changed::show-panel-icon', () => this._syncVisibility()),
+      this._settings.connect('changed::menu-style', () => this._applyMenuStyle()),
     ];
     this._syncVisibility();
+    this._applyMenuStyle();
+  }
+
+  _tooltipText() {
+    const hint = [_('Click: quick menu')];
+    const right = this._settings.get_string('icon-right-click');
+    const middle = this._settings.get_string('icon-middle-click');
+    if (right !== 'menu') hint.push(`${_('Right-click')}: ${_(ACTION_LABELS[right])}`);
+    if (middle !== 'menu') hint.push(`${_('Middle-click')}: ${_(ACTION_LABELS[middle])}`);
+    return `${_('Numeric Clock')} — ${formatNow(this._settings.get_string('format-string'))}\n${hint.join(' · ')}`;
+  }
+
+  // Left-click always toggles the quick menu (PanelMenu.Button default);
+  // right- and middle-click run the action chosen in Preferences.
+  vfunc_event(event) {
+    if (event.type() === Clutter.EventType.BUTTON_PRESS) {
+      const key = {
+        [Clutter.BUTTON_SECONDARY]: 'icon-right-click',
+        [Clutter.BUTTON_MIDDLE]: 'icon-middle-click',
+      }[event.get_button()];
+      if (key) {
+        this._tooltip.hide();
+        this.runAction(this._settings.get_string(key));
+        return Clutter.EVENT_STOP;
+      }
+    }
+    return super.vfunc_event(event);
+  }
+
+  runAction(action) {
+    if (action === 'menu') {
+      this.menu.sourceActor = this;
+      this.menu.toggle();
+      return;
+    }
+    this.menu.close();
+    if (action === 'preferences')
+      this._openPrefs();
+    else
+      copyTextToClipboard(formatNow(this._settings.get_string('format-string')));
+  }
+
+  // System follows the shell theme; Light and Dark use Numeric Clock's own colors.
+  _applyMenuStyle() {
+    const style = this._settings.get_string('menu-style');
+    for (const s of MENU_STYLES)
+      this.menu.actor.remove_style_class_name(`numeric-clock-style-${s}`);
+    this.menu.actor.add_style_class_name(`numeric-clock-style-${style}`);
+    this._tooltip.styleClass = style === 'system' ? '' : `numeric-clock-tooltip-${style}`;
+    for (const [s, item] of this._styleItems ?? [])
+      item.setOrnament(s === style ? PopupMenu.Ornament.CHECK : PopupMenu.Ornament.NONE);
   }
 
   destroy() {
@@ -187,9 +242,9 @@ class NumericClockIndicator extends PanelMenu.Button {
     });
   }
 
-  // With the panel icon hidden, anchor the menu to the clock that was clicked.
+  // Open the menu under whatever was clicked: the clock, or this icon.
   openQuickMenu(anchor) {
-    this.menu.sourceActor = this.visible || !anchor ? this : anchor;
+    this.menu.sourceActor = anchor ?? this;
     this.menu.toggle();
   }
 
@@ -220,6 +275,18 @@ class NumericClockIndicator extends PanelMenu.Button {
       presets.menu.addMenuItem(item);
     }
     this.menu.addMenuItem(presets);
+
+    const styles = new PopupMenu.PopupSubMenuMenuItem(_('Menu style'), true);
+    if (styles.icon)
+      styles.icon.icon_name = 'applications-graphics-symbolic';
+    this._styleItems = [];
+    for (const style of MENU_STYLES) {
+      const item = new PopupMenu.PopupMenuItem(_(STYLE_LABELS[style]));
+      item.connect('activate', () => this._settings.set_string('menu-style', style));
+      styles.menu.addMenuItem(item);
+      this._styleItems.push([style, item]);
+    }
+    this.menu.addMenuItem(styles);
 
     this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
