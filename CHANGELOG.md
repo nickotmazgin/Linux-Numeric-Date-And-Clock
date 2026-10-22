@@ -9,6 +9,7 @@
 - Right-clicking the top-bar clock now opens the quick menu under the clock instead of under the icon
 - Gallery redone from a real GNOME Shell session with descriptive file names (tray menu, presets, menu styles, clock menu, tooltip, copy, Preferences); new collage and a more readable social preview
 - Nested smoke test covers click actions and menu styles (31 checks)
+- Narrated 1080p demo video (README and [Discussion #76](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/76)), made with `tools/media/demo_video.py`
 
 ## v17.5.0 — 2026-10-22
 

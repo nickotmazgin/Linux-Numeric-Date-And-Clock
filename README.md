@@ -20,6 +20,8 @@ Stock GNOME shows `Oct 22  13:17` and offers no date-format setting. Numeric Clo
 
 **Latest:** v17.6.0 — ESM build v30 for **GNOME 45–51** (**X11/Xorg validated** on Zorin OS 18.1 / GNOME Shell 46)
 
+> **Demo:** [watch the 82-second tour](#demo-video) · [announcement](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/76)
+
 > Download [v17.6.0](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older stable releases are kept for rollback. See [CHANGELOG.md](CHANGELOG.md) for what changed.
 
 **UUID:** `numeric-clock@nickotmazgin`
@@ -38,6 +40,14 @@ Stock GNOME shows `Oct 22  13:17` and offers no date-format setting. Numeric Clo
 * **Support:** [SUPPORT.md](.github/SUPPORT.md) · **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md)
 * **Issues:** [Report a bug](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
 * **Discussions:** [Ask a question](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
+
+---
+
+## Demo video
+
+*82-second narrated tour of v17.6.0: the clock, every tray click, presets, menu styles and Preferences.*
+
+https://github.com/user-attachments/assets/ed9d6851-2878-4a63-8c46-d8a2bbcb1d06
 
 ---
 
@@ -352,7 +362,7 @@ Every AI-assisted change is human-reviewed, tested on real GNOME sessions, and a
 
 **Search for:** GNOME numeric clock, GNOME top bar date format, change GNOME clock format, DD/MM/YYYY clock GNOME, ISO 8601 clock Linux, GNOME clock seconds, 24 hour clock GNOME, GNOME week number top bar
 
-**Also:** [Announcement & downloads discussion](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/9) · [Releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases) · [Changelog](CHANGELOG.md)
+**Also:** [Demo video](#demo-video) · [v17.6.0 announcement](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/76) · [Overview & downloads discussion](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/9) · [Releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases) · [Changelog](CHANGELOG.md)
 
 ## More GNOME extensions by Nick Otmazgin
 
