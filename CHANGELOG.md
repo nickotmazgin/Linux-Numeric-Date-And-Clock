@@ -7,7 +7,7 @@
 - **Fix:** after right-clicking the top-bar clock, the next left-click on the panel icon opened the menu over by the clock. The menu now goes back to the icon whenever it closes, and a left-click on the icon always opens it under the icon
 - **About Numeric Clock** in the quick menu opens Preferences straight on the About page (new `prefs-page` setting)
 - **Donate** in the quick menu opens the PayPal donation page
-- New screenshots, collage, social preview and demo video for 17.7
+- New screenshots, collage, social preview and demo video for 17.7 ([YouTube](https://youtu.be/VlcEy6rQHBw))
 - Tests cover the menu anchor after a clock right-click, the new items, and opening Preferences on the About page
 
 ## v17.6.1 — 2026-10-22
