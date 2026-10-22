@@ -22,6 +22,7 @@ const RESCAN_TICKS = 5;
 const MENU_STYLES = ['system', 'light', 'dark'];
 const STYLE_LABELS = { system: 'System', light: 'Light', dark: 'Dark' };
 const ACTION_LABELS = { menu: 'quick menu', preferences: 'preferences', copy: 'copy time' };
+const DONATE_URL = 'https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW';
 
 function looksLikeClock(lab) {
   const cls = lab.get_style_class_name?.() || '';
@@ -61,6 +62,14 @@ function copyTextToClipboard(text) {
     Main.notify(_('Numeric Clock'), _('Time copied to clipboard'));
   } catch (e) {
     console.error('[Numeric Clock] clipboard error:', e);
+  }
+}
+
+function openUri(uri) {
+  try {
+    Gio.AppInfo.launch_default_for_uri(uri, global.create_app_launch_context(0, -1));
+  } catch (e) {
+    console.warn(`[Numeric Clock] could not open ${uri}: ${e.message}`);
   }
 }
 
@@ -179,6 +188,9 @@ class NumericClockIndicator extends PanelMenu.Button {
         this.runAction(this._settings.get_string(key));
         return Clutter.EVENT_STOP;
       }
+      // A left-click on the icon always opens the menu under the icon.
+      if (!this.menu.isOpen)
+        this.menu.sourceActor = this;
     }
     return super.vfunc_event(event);
   }
@@ -294,12 +306,27 @@ class NumericClockIndicator extends PanelMenu.Button {
     prefsItem.connect('activate', () => this._openPrefs());
     this.menu.addMenuItem(prefsItem);
 
+    // Preferences reads prefs-page once and opens on the About page.
+    const aboutItem = menuItemWithIcon(_('About Numeric Clock'), 'help-about-symbolic');
+    aboutItem.connect('activate', () => {
+      this._settings.set_string('prefs-page', 'about');
+      this._openPrefs();
+    });
+    this.menu.addMenuItem(aboutItem);
+
+    const donateItem = menuItemWithIcon(_('Donate'), 'emblem-favorite-symbolic');
+    donateItem.connect('activate', () => openUri(DONATE_URL));
+    this.menu.addMenuItem(donateItem);
+
     this.menu.connect('open-state-changed', (_menu, open) => {
       if (open) {
         this._tooltip.hide();
         this._startMenuTimer();
       } else {
         this._clearMenuTimer();
+        // Opened from the clock, the menu is anchored there; put it back on
+        // the icon so the next left-click on the icon opens it in the right place.
+        this.menu.sourceActor = this;
       }
     });
   }

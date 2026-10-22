@@ -246,6 +246,11 @@ export default class NumericClockPrefs extends ExtensionPreferences {
 
     window.add(pageSettings);
     window.add(pageAbout);
+    // "About Numeric Clock" in the quick menu asks for the About page.
+    if (settings.get_string('prefs-page') === 'about') {
+      window.set_visible_page(pageAbout);
+      settings.reset('prefs-page');
+    }
 
     rowFmt.connect('changed', () => {
       if (rowFmt.text.length > MAX_FORMAT_LENGTH)

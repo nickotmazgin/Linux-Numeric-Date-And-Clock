@@ -1,6 +1,7 @@
 // Test harness for tools/nested-smoke-test.sh — never shipped in the release zip.
 // Drives Numeric Clock inside an isolated nested GNOME Shell and logs "NCTEST" lines.
 import GLib from 'gi://GLib';
+import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -115,6 +116,31 @@ async function run() {
   }
   const styleSub = ind().menu._getMenuItems().find(i => i.label?.text === 'Menu style');
   check('menu style submenu', styleSub?.menu._getMenuItems().length === 3);
+
+  // Bug fix 17.7: opened from the clock, closed, then opened from the icon,
+  // the menu must sit under the icon again, not under the clock.
+  ind().openQuickMenu(dm._clockDisplay);
+  await wait(300);
+  check('clock menu anchored to clock', ind().menu.sourceActor === dm._clockDisplay);
+  ind().menu.close();
+  await wait(300);
+  check('anchor back on icon after close', ind().menu.sourceActor === ind());
+  ind().runAction('menu');
+  await wait(300);
+  const [ix] = ind().get_transformed_position();
+  const [mx] = ind().menu.actor.get_transformed_position();
+  const [mw] = ind().menu.actor.get_transformed_size();
+  check('icon menu opens under icon', ind().menu.isOpen && ind().menu.sourceActor === ind() && ix >= mx - 2 && ix <= mx + mw + 2, `icon x=${ix} menu ${mx}..${mx + mw}`);
+  ind().menu.close();
+  await wait(300);
+
+  // About and Donate items
+  const labels = ind().menu._getMenuItems().map(i => i.label?.text);
+  check('about and donate items', labels.includes('About Numeric Clock') && labels.includes('Donate'), JSON.stringify(labels));
+  prefsOpened = 0;
+  ind().menu._getMenuItems().find(i => i.label?.text === 'About Numeric Clock').activate(Clutter.get_current_event());
+  check('about opens prefs on About page', prefsOpened === 1 && s.get_string('prefs-page') === 'about');
+  s.reset('prefs-page');
 
   // Non-top-bar mode walks the stage without touching the calendar popup.
   s.set_boolean('only-topbar', false);

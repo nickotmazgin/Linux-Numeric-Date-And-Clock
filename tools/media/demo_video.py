@@ -49,7 +49,7 @@ BG = (24, 27, 36)
 CAPTIONS = {
     'clock': 'Numeric date and time · ticks on the second',
     'tooltip': 'Hover: the time and what each click does',
-    'menu': 'Left-click: quick menu',
+    'menu': 'Left-click: quick menu · presets · style · Preferences · About · Donate',
     'presets': 'Quick presets: ISO 8601 · week number · 12-hour · international',
     'styles': 'Menu style: System · Light · Dark',
     'copy': 'Middle-click: copy the current time',

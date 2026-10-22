@@ -20,11 +20,11 @@ A lightweight **GNOME Shell extension** that turns the top-bar clock into a **nu
 
 Stock GNOME shows `Oct 22  13:17` and offers no date-format setting. Numeric Clock shows `22/10/2026 13:17:05` (or whatever you choose), ticks exactly on the second, and puts the stock clock back the moment you disable it.
 
-**Latest:** v17.6.1 — ESM build v31 for **GNOME 45–51** (**X11/Xorg validated** on Zorin OS 18.1 / GNOME Shell 46)
+**Latest:** v17.7.0 — ESM build v32 for **GNOME 45–51** (**X11/Xorg validated** on Zorin OS 18.1 / GNOME Shell 46)
 
 > **Demo:** [watch the 82-second tour](#demo-video) ([YouTube](https://youtu.be/qT1IHIulxLo)) · [write-up on DEV](https://dev.to/nickotmazgin/numeric-clock-176-a-numeric-date-and-time-for-the-gnome-top-bar-now-with-gnome-51-menu-styles-51oh) · [announcement](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/76)
 
-> Download [v17.6.1](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older stable releases are kept for rollback. See [CHANGELOG.md](CHANGELOG.md) for what changed.
+> Download [v17.7.0](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older stable releases are kept for rollback. See [CHANGELOG.md](CHANGELOG.md) for what changed.
 
 **UUID:** `numeric-clock@nickotmazgin`
 
@@ -47,7 +47,7 @@ Stock GNOME shows `Oct 22  13:17` and offers no date-format setting. Numeric Clo
 
 ## Demo video
 
-*82-second narrated tour of v17.6.0: the clock, every tray click, presets, menu styles and Preferences. Also on [YouTube](https://youtu.be/qT1IHIulxLo).*
+*Narrated tour of v17.7.0: the clock, every tray click, presets, menu styles and Preferences. Also on [YouTube](https://youtu.be/qT1IHIulxLo).*
 
 https://github.com/user-attachments/assets/ed9d6851-2878-4a63-8c46-d8a2bbcb1d06
 
@@ -55,15 +55,15 @@ https://github.com/user-attachments/assets/ed9d6851-2878-4a63-8c46-d8a2bbcb1d06
 
 ## Screenshots
 
-*Numeric Clock v17.6.0 on GNOME Shell — click any image to view it full size.*
+*Numeric Clock v17.7.0 on GNOME Shell — click any image to view it full size.*
 
-[![Numeric Clock v17.6.0 collage](screenshots/collage.jpg)](screenshots/collage.jpg)
+[![Numeric Clock v17.7.0 collage](screenshots/collage.jpg)](screenshots/collage.jpg)
 
 <table>
   <tr>
     <td align="center" valign="top">
-      <a href="screenshots/tray-menu.jpg"><img src="screenshots/tray-menu.jpg" width="260" alt="Numeric Clock — Panel icon — left-click quick menu"></a><br>
-      Panel icon — left-click quick menu
+      <a href="screenshots/tray-menu.jpg"><img src="screenshots/tray-menu.jpg" width="260" alt="Numeric Clock — Panel icon — left-click quick menu with About and Donate"></a><br>
+      Panel icon — left-click quick menu with About and Donate
     </td>
     <td align="center" valign="top">
       <a href="screenshots/quick-presets.jpg"><img src="screenshots/quick-presets.jpg" width="260" alt="Numeric Clock — Quick presets"></a><br>
@@ -124,7 +124,7 @@ https://github.com/user-attachments/assets/ed9d6851-2878-4a63-8c46-d8a2bbcb1d06
 * **Live preview** in settings, a built-in **format codes** cheat sheet, and invalid formats flagged (the clock falls back to the default instead of going blank)
 * Configurable **update interval** (1–300 seconds)
 * **Smooth tick** — updates land exactly on each second boundary
-* **Panel icon** — left-click for the quick menu (presets, copy time, menu style, preferences), **right-click for Preferences**, **middle-click to copy the time** (both configurable); the hover tooltip shows the time and the click hints
+* **Panel icon** — left-click for the quick menu (copy time, presets, menu style, Preferences, About, Donate), **right-click for Preferences**, **middle-click to copy the time** (both configurable); the hover tooltip shows the time and the click hints
 * **Menu style** — System (follows the shell theme), Light or Dark
 * **Right-click the formatted clock** for the same quick menu (left-click still opens GNOME calendar)
 * **Restores the stock clock immediately** when disabled or uninstalled
@@ -137,17 +137,17 @@ https://github.com/user-attachments/assets/ed9d6851-2878-4a63-8c46-d8a2bbcb1d06
 
 | GNOME | Status | Extension version | Notes |
 | ----- | ------ | ----------------: | ----- |
-| **45–51** | **Supported** | 31 | ESM build; do not ship `schemas/gschemas.compiled` |
+| **45–51** | **Supported** | 32 | ESM build; do not ship `schemas/gschemas.compiled` |
 | **42–44** | **Discontinued** | — | No longer built or maintained |
 
 | Session | Status | Notes |
 | ------- | ------ | ----- |
 | **X11 / Xorg** | **Supported · validated** | Runtime-tested on Zorin OS 18.1 / GNOME Shell 46 / X11 |
-| **Wayland** | **Supported** | **v17.6.1** passes the nested GNOME Shell (Wayland) smoke test |
+| **Wayland** | **Supported** | **v17.7.0** passes the nested GNOME Shell (Wayland) smoke test |
 
 **Minimum requirement:** GNOME Shell **45** on a **Wayland or X11/Xorg** session.
 
-> **Validation scope (v17.6.1):** runtime-tested on GNOME Shell 46 (X11 desktop and a nested Wayland shell via `tools/nested-smoke-test.sh`). GNOME 47–51 support follows the official porting guides; Numeric Clock uses none of the APIs they removed.
+> **Validation scope (v17.7.0):** runtime-tested on GNOME Shell 46 (X11 desktop and a nested Wayland shell via `tools/nested-smoke-test.sh`). GNOME 47–51 support follows the official porting guides; Numeric Clock uses none of the APIs they removed.
 
 Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that ship Shell 45–51.
 
@@ -157,10 +157,10 @@ Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that 
 
 ### From GitHub release (recommended)
 
-Download **`numeric-clock@nickotmazgin.v31.shell-extension.zip`** from the [latest release](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest) (or `gh release download -R nickotmazgin/Linux-Numeric-Date-And-Clock`), then:
+Download **`numeric-clock@nickotmazgin.v32.shell-extension.zip`** from the [latest release](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest) (or `gh release download -R nickotmazgin/Linux-Numeric-Date-And-Clock`), then:
 
 ```bash
-gnome-extensions install --force numeric-clock@nickotmazgin.v31.shell-extension.zip
+gnome-extensions install --force numeric-clock@nickotmazgin.v32.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 gnome-extensions prefs numeric-clock@nickotmazgin
 ```
@@ -170,7 +170,7 @@ gnome-extensions prefs numeric-clock@nickotmazgin
 ```bash
 ./tools/build.sh
 ./tools/validate.sh
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v31.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v32.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 ```
 
@@ -198,6 +198,7 @@ Settings apply immediately. The **format string** is saved when you press **Ente
 **Quick access:**
 
 * **Left-click** the panel clock icon for the quick menu, **right-click** it for Preferences, **middle-click** it to copy the time
+* The quick menu also has **About Numeric Clock** (opens Preferences on the About page) and **Donate**
 * **Right-click** or **middle-click** the formatted top-bar clock for the same menu
 * **Left-click** the clock still opens the standard GNOME calendar
 
@@ -298,7 +299,7 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 ## Packaging & releases (maintainers)
 
 ```bash
-./tools/build.sh                # -> dist/numeric-clock@nickotmazgin.v31.shell-extension.zip (GNOME 45–51)
+./tools/build.sh                # -> dist/numeric-clock@nickotmazgin.v32.shell-extension.zip (GNOME 45–51)
 ./tools/validate.sh
 ./tools/nested-smoke-test.sh    # isolated nested GNOME Shell run; prints PASSED/FAILED
 ./tools/prefs-test.sh           # Preferences behaviour in plain gjs
