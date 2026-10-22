@@ -1,4 +1,43 @@
 /* Numeric Clock. The panel icon takes its size and color from the shell
-   theme's system-status-icon class; this only styles the hover tooltip. */
+   theme's system-status-icon class; this styles the tooltip and the optional
+   light/dark menu styles (System follows the shell theme). */
 
 .numeric-clock-tooltip { font-size: 0.9em; }
+
+/* ---- Menu style: Light ---- */
+.numeric-clock-style-light .popup-menu-content {
+  background-color: #fafafb;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #2e3436;
+}
+.numeric-clock-style-light .popup-menu-item { color: #2e3436; }
+.numeric-clock-style-light .popup-menu-item:insensitive { color: rgba(46, 52, 54, 0.6); }
+.numeric-clock-style-light .popup-menu-item:hover,
+.numeric-clock-style-light .popup-menu-item:focus { background-color: rgba(0, 0, 0, 0.08); color: #2e3436; }
+.numeric-clock-style-light .popup-menu-item:active,
+.numeric-clock-style-light .popup-menu-item:checked { background-color: rgba(0, 0, 0, 0.12); color: #2e3436; }
+.numeric-clock-style-light .popup-sub-menu { background-color: rgba(0, 0, 0, 0.04); }
+.numeric-clock-style-light .popup-separator-menu-item-separator { background-color: rgba(0, 0, 0, 0.1); }
+.numeric-clock-style-light .popup-menu-ornament,
+.numeric-clock-style-light .popup-menu-arrow,
+.numeric-clock-style-light .popup-menu-icon { color: #2e3436; }
+.numeric-clock-tooltip-light { background-color: #fafafb; color: #2e3436; border: 1px solid rgba(0, 0, 0, 0.15); }
+
+/* ---- Menu style: Dark ---- */
+.numeric-clock-style-dark .popup-menu-content {
+  background-color: #2b2b2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.numeric-clock-style-dark .popup-menu-item { color: #ffffff; }
+.numeric-clock-style-dark .popup-menu-item:insensitive { color: rgba(255, 255, 255, 0.6); }
+.numeric-clock-style-dark .popup-menu-item:hover,
+.numeric-clock-style-dark .popup-menu-item:focus { background-color: rgba(255, 255, 255, 0.1); color: #ffffff; }
+.numeric-clock-style-dark .popup-menu-item:active,
+.numeric-clock-style-dark .popup-menu-item:checked { background-color: rgba(255, 255, 255, 0.15); color: #ffffff; }
+.numeric-clock-style-dark .popup-sub-menu { background-color: rgba(255, 255, 255, 0.04); }
+.numeric-clock-style-dark .popup-separator-menu-item-separator { background-color: rgba(255, 255, 255, 0.1); }
+.numeric-clock-style-dark .popup-menu-ornament,
+.numeric-clock-style-dark .popup-menu-arrow,
+.numeric-clock-style-dark .popup-menu-icon { color: #ffffff; }
+.numeric-clock-tooltip-dark { background-color: #1e1e20; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.12); }

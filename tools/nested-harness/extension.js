@@ -2,6 +2,7 @@
 // Drives Numeric Clock inside an isolated nested GNOME Shell and logs "NCTEST" lines.
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
+import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
@@ -73,7 +74,7 @@ async function run() {
   s.set_string('format-string', '%d/%m/%Y %H:%M:%S');
   ind().openQuickMenu(dm._clockDisplay);
   await wait(300);
-  check('menu opens from clock', ind().menu.isOpen);
+  check('menu opens from clock', ind().menu.isOpen && ind().menu.sourceActor === dm._clockDisplay);
   const items = ind().menu._getMenuItems().map(i => i.label?.text ?? '-');
   L('menu items', JSON.stringify(items));
   check('menu shows time', items[0] === fmt('%d/%m/%Y %H:%M:%S') || items[0].length > 0, items[0]);
@@ -86,6 +87,34 @@ async function run() {
   check('menu opens with icon hidden', ind().menu.isOpen && ind().menu.sourceActor === dm._clockDisplay);
   ind().menu.close();
   s.set_boolean('show-panel-icon', true);
+
+  // Panel icon click actions (right/middle) and menu styles.
+  let prefsOpened = 0;
+  ind()._openPrefs = () => prefsOpened++;
+  check('default right-click = preferences', s.get_string('icon-right-click') === 'preferences');
+  check('default middle-click = copy', s.get_string('icon-middle-click') === 'copy');
+  ind().runAction('preferences');
+  check('preferences action', prefsOpened === 1 && !ind().menu.isOpen);
+  ind().runAction('copy');
+  await wait(200);
+  const clip = await new Promise(r => St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_c, t) => r(t)));
+  check('copy action', /^\d{2}\/\d{2}\/\d{4}/.test(clip ?? ''), clip);
+  ind().runAction('menu');
+  await wait(300);
+  check('menu action opens menu', ind().menu.isOpen);
+  ind().runAction('menu');
+  await wait(300);
+  check('menu action toggles closed', !ind().menu.isOpen);
+  check('tooltip lists clicks', /Right-click: preferences · Middle-click: copy time/.test(ind()._tooltipText()), ind()._tooltipText());
+  for (const style of ['light', 'dark', 'system']) {
+    s.set_string('menu-style', style);
+    await wait(50);
+    const cls = ind().menu.actor.get_style_class_name();
+    check(`menu style ${style}`, cls.includes(`numeric-clock-style-${style}`) &&
+      ['light', 'dark', 'system'].filter(x => x !== style).every(x => !cls.includes(`numeric-clock-style-${x}`)), cls);
+  }
+  const styleSub = ind().menu._getMenuItems().find(i => i.label?.text === 'Menu style');
+  check('menu style submenu', styleSub?.menu._getMenuItems().length === 3);
 
   // Non-top-bar mode walks the stage without touching the calendar popup.
   s.set_boolean('only-topbar', false);

@@ -14,7 +14,7 @@ Recent releases were developed with help from AI pair-programming agents. As the
 |-----------|------|
 | **[OpenAI Codex](https://openai.com/codex/)** | Release engineering, signed-tag release workflows, release validation and CI hardening |
 | **Cursor (Agent)** | Code review, debugging, documentation |
-| **[Claude](https://github.com/claude)** (Anthropic, via [Claude Code](https://claude.com/claude-code)) | v17.5.0 audit: GNOME 51 port, clock engine fixes, icon redraw, preferences rebuild, nested-shell smoke test, lint CI |
+| **[Claude](https://github.com/claude)** (Anthropic, via [Claude Code](https://claude.com/claude-code)) | v17.5.0 audit (GNOME 51 port, clock engine fixes, icon redraw, preferences rebuild, nested-shell smoke test, lint CI); v17.6.0 menu styles and panel icon clicks |
 
 ## Community
 

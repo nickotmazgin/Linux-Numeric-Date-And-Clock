@@ -32,5 +32,35 @@
       <summary>Right-click clock for quick menu</summary>
       <description>Right-click or middle-click the formatted top-bar clock to open the Numeric Clock quick menu. Left-click still opens the GNOME calendar.</description>
     </key>
+    <key name="menu-style" type="s">
+      <choices>
+        <choice value="system"/>
+        <choice value="light"/>
+        <choice value="dark"/>
+      </choices>
+      <default>'system'</default>
+      <summary>Menu style</summary>
+      <description>Quick menu and tooltip appearance: follow the shell theme (system), or always light or dark.</description>
+    </key>
+    <key name="icon-right-click" type="s">
+      <choices>
+        <choice value="menu"/>
+        <choice value="preferences"/>
+        <choice value="copy"/>
+      </choices>
+      <default>'preferences'</default>
+      <summary>Panel icon right-click</summary>
+      <description>What right-clicking the panel icon does: open the quick menu, open Preferences, or copy the current time. Left-click always opens the quick menu.</description>
+    </key>
+    <key name="icon-middle-click" type="s">
+      <choices>
+        <choice value="menu"/>
+        <choice value="preferences"/>
+        <choice value="copy"/>
+      </choices>
+      <default>'copy'</default>
+      <summary>Panel icon middle-click</summary>
+      <description>What middle-clicking the panel icon does: open the quick menu, open Preferences, or copy the current time.</description>
+    </key>
   </schema>
 </schemalist>
