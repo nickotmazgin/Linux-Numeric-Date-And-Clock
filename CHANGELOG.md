@@ -1,5 +1,16 @@
 # Changelog
 
+## v17.6.1 — 2026-10-22
+
+**Fix: a stray key press could replace the clock format.**
+
+- Preferences opened with the format field focused and its text selected, and every key press was saved at once, so typing anything (for example `\\`) replaced the whole format. Now the window opens with nothing focused, and the format is saved only when you press **Enter** or the ✓ button
+- Empty formats and formats without any `%` code are refused instead of saved; the preview shows what you type before you apply it
+- Opening Preferences from the panel icon no longer logs "Unhandled promise rejection" when the Extensions app is slow to answer
+- New `tools/prefs-test.sh` checks the Preferences behaviour in plain gjs
+
+> **Recommended upgrade** from v17.6.0. If your clock shows odd text, open Preferences and press **Reset**.
+
 ## v17.6.0 — 2026-10-22
 
 **Menu styles and distinct panel icon clicks.**

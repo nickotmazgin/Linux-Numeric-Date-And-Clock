@@ -22,6 +22,7 @@ Bug reports, ideas and pull requests are welcome. For security issues, see
 ```bash
 ./tools/build.sh && ./tools/validate.sh
 ./tools/nested-smoke-test.sh    # drive the clock in a nested shell; prints PASSED/FAILED
+./tools/prefs-test.sh           # Preferences behaviour in plain gjs; prints PASSED/FAILED
 npx -y eslint@9 .               # lint (same as CI)
 ```
 
