@@ -1,4 +1,4 @@
-# Numeric Clock (GNOME Shell Extension)
+# Numeric Clock — numeric date & time for the GNOME top bar
 
 [![Release](https://img.shields.io/github/v/release/nickotmazgin/Linux-Numeric-Date-And-Clock?display_name=tag&label=release)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/nickotmazgin/Linux-Numeric-Date-And-Clock/validate.yml?branch=main&label=CI)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/actions)
@@ -11,9 +11,12 @@
 
 [![Issues](https://img.shields.io/github/issues/nickotmazgin/Linux-Numeric-Date-And-Clock)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
 [![Discussions](https://img.shields.io/github/discussions/nickotmazgin/Linux-Numeric-Date-And-Clock?label=discussions&color=8B5CF6)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
+[![Stars](https://img.shields.io/github/stars/nickotmazgin/Linux-Numeric-Date-And-Clock?style=flat&color=yellow)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/stargazers)
 [![i18n](https://img.shields.io/badge/i18n-gettext-blue)](#features)
 
-A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY**, **ISO 8601**, **24-hour**, or **12-hour** time with optional **seconds**, anywhere in the world.
+A lightweight **GNOME Shell extension** that turns the top-bar clock into a **numeric, fully configurable date and time** — **DD/MM/YYYY**, **ISO 8601 (YYYY-MM-DD)**, **24-hour** or **12-hour** time, with **seconds**, **weekday** or **ISO week number** — using any `strftime` format, anywhere in the world.
+
+Stock GNOME shows `Oct 22  13:17` and offers no date-format setting. Numeric Clock shows `22/10/2026 13:17:05` (or whatever you choose), ticks exactly on the second, and puts the stock clock back the moment you disable it.
 
 **Latest:** v17.5.0 — ESM build v29 for **GNOME 45–51** (**X11/Xorg validated** on Zorin OS 18.1 / GNOME Shell 46)
 
@@ -21,7 +24,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 **UUID:** `numeric-clock@nickotmazgin`
 
-> **Keywords:** GNOME clock · numeric date · DD/MM/YYYY · ISO 8601 · 24-hour time · Wayland · X11 · Xorg · top bar · Linux desktop · open source
+> **Keywords:** GNOME clock format · GNOME top bar date · numeric date · DD/MM/YYYY · ISO 8601 · 24-hour clock · seconds in top bar · week number · strftime · custom date format · GNOME Shell extension · Ubuntu · Fedora · Zorin OS · Wayland · X11 · Xorg · open source
 
 > **GNOME Shell 42–44 is no longer supported.** Numeric Clock requires **GNOME 45–51**.
 
@@ -113,6 +116,8 @@ Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that 
 
 ### From GitHub release (recommended)
 
+Download **`numeric-clock@nickotmazgin.v29.shell-extension.zip`** from the [latest release](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest) (or `gh release download -R nickotmazgin/Linux-Numeric-Date-And-Clock`), then:
+
 ```bash
 gnome-extensions install --force numeric-clock@nickotmazgin.v29.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
@@ -186,6 +191,28 @@ Examples:
 * `%d/%m/%Y %H:%M:%S` → `30/05/2026 18:20:06`
 * `%Y-%m-%d %H:%M:%S` → `2026-05-30 18:20:06`
 * `%m/%d/%Y %I:%M:%S %p` → `05/30/2026 06:20:06 PM`
+
+---
+
+## FAQ
+
+**How do I show the date as DD/MM/YYYY in the GNOME top bar?**
+Install Numeric Clock — the default format is `%d/%m/%Y %H:%M:%S`. GNOME itself has no date-format setting for the top bar.
+
+**How do I show seconds in the GNOME clock?**
+Use any format with `%S` (the default does) and keep *Update interval* at `1` with *Smooth tick* on.
+
+**Can I use ISO 8601 (YYYY-MM-DD) or show the week number?**
+Yes — use the *ISO 8601* or *ISO date + week number* preset, or type `%Y-%m-%d W%V %H:%M`.
+
+**Does it work on Wayland and X11, Ubuntu, Fedora, Zorin OS?**
+Yes, on any distribution with GNOME Shell 45–51, in Wayland and X11/Xorg sessions.
+
+**Does it change my timezone or locale?**
+No. It only changes how the top-bar text looks; the time, timezone and month/day names come from your system settings.
+
+**Does it send any data anywhere?**
+No network access and no telemetry — see [PRIVACY.md](PRIVACY.md).
 
 ---
 
@@ -283,9 +310,11 @@ Every AI-assisted change is human-reviewed, tested on real GNOME sessions, and a
 
 ## Find this project
 
-**GitHub topics:** `gnome-shell-extension` · `clock` · `24-hour` · `numeric-date` · `top-bar` · `seconds` · `wayland` · `x11` · `xorg` · `linux` · `open-source`
+**GitHub topics:** `gnome` · `gnome-shell` · `gnome-shell-extension` · `gnome-extension` · `linux` · `linux-desktop` · `clock` · `date-format` · `datetime` · `numeric-date` · `iso8601` · `24-hour` · `seconds` · `strftime` · `top-bar` · `wayland` · `x11` · `ubuntu` · `fedora` · `open-source`
 
-**Search for:** GNOME numeric clock, Linux top bar date format, DD/MM/YYYY clock extension, 24 hour clock GNOME
+**Search for:** GNOME numeric clock, GNOME top bar date format, change GNOME clock format, DD/MM/YYYY clock GNOME, ISO 8601 clock Linux, GNOME clock seconds, 24 hour clock GNOME, GNOME week number top bar
+
+**Also:** [Announcement & downloads discussion](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/9) · [Releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases) · [Changelog](CHANGELOG.md)
 
 ## More GNOME extensions by Nick Otmazgin
 
