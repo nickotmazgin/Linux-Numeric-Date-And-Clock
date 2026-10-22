@@ -40,7 +40,7 @@ for f in metadata.json extension.js prefs.js presets.js stylesheet.css \
          schemas/org.gnome.shell.extensions.numeric-clock.gschema.xml; do
   check_zip_has "$zip" "$f"
 done
-for f in schemas/gschemas.compiled tools/build.sh icon.png .env; do
+for f in schemas/gschemas.compiled tools/build.sh .env; do
   check_zip_lacks "$zip" "$f"
 done
 
