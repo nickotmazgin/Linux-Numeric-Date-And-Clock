@@ -1,15 +1,25 @@
 # Changelog
 
-## Unreleased (main)
+## v17.5.0 — 2026-10-22
 
-**Repository maintenance — no extension code changes since v17.4.4.**
+**GNOME Shell 51 support, a sharper icon, and an audit of the clock engine.**
 
-- README: X11/Xorg-validated vs Wayland-supported badges and compatibility table
-- Security policy, bug template, and release-note footer aligned with session validation scope
-- CI dependency bumps (CodeQL 4.37.8, actions/checkout pin) — already on `main`
-- Docs/screenshots refresh (#50–#51) — already on `main`
+- GNOME Shell **51** in `shell-version` (now 45–51). Numeric Clock uses nothing GNOME 51 removed or changed (`St` `vertical`, async `disable()`, `ui/pointerWatcher.js`, `Shell.GLSLEffect`, `Clutter.get_default_backend()`, `PopupMenu.open()` animation argument), per the official porting guide
+- **Smooth tick now really ticks on the second.** It used `timeout_add_seconds()` after the first tick, which GLib shifts by a per-session offset, so seconds could lag by up to one second. Each tick now lands within ~10 ms of the boundary
+- **Invalid or empty formats no longer blank the clock** — GLib returns `null` instead of throwing, and an empty string showed nothing. Both fall back to the default format; Preferences marks the format field red
+- **Disabling restores the stock clock immediately** (it previously waited up to a minute for GNOME's next update) and puts back the clock label's original click behavior
+- **"Only change the top bar clock" off is safer:** other labels are taken over only when their whole text looks like a clock or they carry a `clock` style class. Previously any label containing a day or month word ("Monday", "may") or a time ("meeting at 10:30") — including notifications and the calendar's world clocks — could be overwritten. The full stage scan also runs every 5 s instead of every second
+- Hooked labels are released when destroyed, so long sessions no longer collect stale signal handlers
+- Right-click menu opens next to the clock when the panel icon is hidden
+- Panel icon **redrawn on the 16 px pixel grid** (crisp hands, no tick merging into the hand) and sized by the shell theme like other status icons instead of a forced 18 px
+- Working hover **tooltip** on the panel icon showing the current time (the old tooltip call did nothing in GNOME Shell)
+- Quick menu: Preferences moved to the bottom, preset notifications name the preset
+- New preset: **ISO date + week number** (`%Y-%m-%d W%V %H:%M`)
+- Preferences rebuilt with libadwaita rows bound directly to settings, so changes from the panel menu show up live; presets show a live sample; new **format codes** cheat sheet; search; the preview timer stops when the window closes
+- Strings marked for translation with the extension's gettext domain
+- Repository: ESLint + ShellCheck CI, nested GNOME Shell smoke test (`tools/nested-smoke-test.sh`), deterministic `tools/build.sh`, `tools/validate.sh` checks the zip against `src/metadata.json`, CONTRIBUTING and Code of Conduct
 
-> **No new GitHub release required** unless extension code or metadata version bumps.
+> **Recommended upgrade** for everyone on v17.4.4 and earlier.
 
 ## v17.4.4 — 2026-06-11
 

@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y zip libglib2.0-bin gnome-shell-extensions
+          sudo apt-get install -y zip libglib2.0-bin
 
       - name: Build and validate release zip
         run: |
@@ -31,7 +31,9 @@ jobs:
         run: |
           VERSION=$(python3 -c "import json; m=json.load(open('src/metadata.json')); print((m.get('version-name') or '').split()[0])")
           EXT_VER=$(python3 -c "import json; print(json.load(open('src/metadata.json'))['version'])")
+          SHELLS=$(python3 -c "import json; s=json.load(open('src/metadata.json'))['shell-version']; print(s[0] + '–' + s[-1])")
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "shells=${SHELLS}" >> "$GITHUB_OUTPUT"
           echo "zip=dist/numeric-clock@nickotmazgin.v${EXT_VER}.shell-extension.zip" >> "$GITHUB_OUTPUT"
 
       - name: Build release notes from CHANGELOG
@@ -45,7 +47,7 @@ jobs:
           TAG="${GITHUB_REF_NAME}"
           ZIP="${{ steps.meta.outputs.zip }}"
           VERSION="${{ steps.meta.outputs.version }}"
-          TITLE="Numeric Clock ${VERSION} — GNOME 45–50"
+          TITLE="Numeric Clock ${VERSION} — GNOME ${{ steps.meta.outputs.shells }}"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$ZIP" --clobber

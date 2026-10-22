@@ -4,38 +4,38 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
+import Pango from 'gi://Pango';
 import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
-import * as Config from 'resource:///org/gnome/shell/misc/config.js';
-import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import { FORMAT_PRESETS, applyPresetToSettings } from './presets.js';
+import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
+import { FORMAT_PRESETS, applyPresetToSettings, formatNow } from './presets.js';
 
-const HOOKED = Symbol('nc-hooked');
-const CLICK_HOOKED = Symbol('nc-click-hooked');
-const TIME_RE = /(^|\s)\d{1,2}:\d{2}(:\d{2})?(\s|$)/i;
-const MONTHS = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/i;
-const DAYS   = /\b(sun|mon|tue|wed|thu|fri|sat)\b/i;
-const PANEL_TOOLTIP = 'Numeric Clock — click for quick menu';
+// Labels outside the top bar DateMenu are only taken over when they look like a
+// clock as a whole ("Wed 13:17", "22/10 1:17 PM") or carry a "clock" style
+// class / name. GNOME's own clock writes "13\u200e\u223624" (LRM + RATIO).
+const CLOCK_NAME_RE = /(^|[-_\s])clock([-_\s]|$)/i;
+const CLOCK_TEXT_RE = /^[\p{L}\p{N}\s,./-]{0,24}?\d{1,2}\u200e?[:\u2236]\d{2}(\u200e?[:\u2236]\d{2})?(\s?[ap]\.?m\.?)?$/iu;
+// When not limited to the top bar, look for new clock labels every few ticks.
+const RESCAN_TICKS = 5;
 
-function formatNow(fmt) {
-  const dt = GLib.DateTime.new_now_local();
-  try { return dt.format(fmt); }
-  catch { return dt.format('%d/%m/%Y %H:%M:%S'); }
+function looksLikeClock(lab) {
+  const cls = lab.get_style_class_name?.() || '';
+  const name = lab.get_name?.() || '';
+  if (CLOCK_NAME_RE.test(cls) || CLOCK_NAME_RE.test(name))
+    return true;
+  const txt = (lab.get_text?.() || '').trim();
+  return txt.length > 0 && txt.length <= 40 && CLOCK_TEXT_RE.test(txt);
 }
 
-function looksLikeClock(txt) {
-  if (!txt) return false;
-  const s = String(txt);
-  return TIME_RE.test(s) || MONTHS.test(s) || DAYS.test(s);
-}
-
-function allStageLabels() {
+// Collect St.Labels under the stage, skipping whole subtrees in `skip`
+// (calendar popup, notifications, our own menu) so their text is never touched.
+function stageLabels(skip) {
   const out = [];
   (function walk(a) {
-    if (!a || typeof a.get_children !== 'function') return;
     for (const c of a.get_children()) {
+      if (skip.has(c)) continue;
       if (c instanceof St.Label) out.push(c);
       walk(c);
     }
@@ -43,38 +43,19 @@ function allStageLabels() {
   return out;
 }
 
-function shellMajor() {
-  try {
-    const ver = Config.PACKAGE_VERSION || '';
-    const major = parseInt(String(ver).split('.')[0], 10);
-    if (Number.isFinite(major) && major > 0)
-      return major;
-  } catch (_e) {}
-  return 46;
-}
-
-function connectStageSignal(stage, addedOrRemoved, callback) {
-  if (!stage || typeof stage.connect !== 'function')
-    return 0;
-  const modern = addedOrRemoved === 'removed' ? 'child-removed' : 'child-added';
-  const legacy = addedOrRemoved === 'removed' ? 'actor-removed' : 'actor-added';
-  const sig = shellMajor() >= 45 ? modern : legacy;
-  try {
-    return stage.connect(sig, callback);
-  } catch (_e) {
-    return 0;
+// Clutter 14 (GNOME 46) renamed actor-added/-removed to child-added/-removed.
+function connectFirst(obj, signals, callback) {
+  for (const sig of signals) {
+    if (GObject.signal_lookup(sig, obj.constructor.$gtype))
+      return obj.connect(sig, callback);
   }
-}
-
-function disconnectStageSignal(stage, id) {
-  if (!stage || !id) return;
-  try { stage.disconnect(id); } catch {}
+  return 0;
 }
 
 function copyTextToClipboard(text) {
   try {
     St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, String(text || ''));
-    Main.notify('Numeric Clock', 'Time copied to clipboard');
+    Main.notify(_('Numeric Clock'), _('Time copied to clipboard'));
   } catch (e) {
     console.error('[Numeric Clock] clipboard error:', e);
   }
@@ -91,10 +72,63 @@ function menuItemWithIcon(label, iconName) {
   return item;
 }
 
+// Hover tooltip for the panel icon, styled like the dash labels.
+class Tooltip {
+  constructor(actor, textFn) {
+    this._actor = actor;
+    this._textFn = textFn;
+    this._label = null;
+    this._timeoutId = 0;
+    actor.connect('notify::hover', () => (actor.hover ? this._schedule() : this.hide()));
+    actor.connect('button-press-event', () => {
+      this.hide();
+      return Clutter.EVENT_PROPAGATE;
+    });
+  }
+
+  _schedule() {
+    this.hide();
+    this._timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 450, () => {
+      this._timeoutId = 0;
+      this._show();
+      return GLib.SOURCE_REMOVE;
+    });
+  }
+
+  _show() {
+    const actor = this._actor;
+    if (!actor.mapped || actor.menu?.isOpen)
+      return;
+    this._label = new St.Label({ style_class: 'dash-label numeric-clock-tooltip', text: this._textFn() });
+    Main.uiGroup.add_child(this._label);
+    const [x, y] = actor.get_transformed_position();
+    const [w, h] = actor.get_transformed_size();
+    const [, lw] = this._label.get_preferred_width(-1);
+    const [, lh] = this._label.get_preferred_height(-1);
+    const monitor = Main.layoutManager.findMonitorForActor(actor) ?? Main.layoutManager.primaryMonitor;
+    const gap = 6;
+    let lx = Math.round(x + w / 2 - lw / 2);
+    lx = Math.max(monitor.x + gap, Math.min(lx, monitor.x + monitor.width - lw - gap));
+    let ly = Math.round(y + h + gap);
+    if (ly + lh > monitor.y + monitor.height)
+      ly = Math.round(y - lh - gap);
+    this._label.set_position(lx, ly);
+  }
+
+  hide() {
+    if (this._timeoutId) {
+      GLib.source_remove(this._timeoutId);
+      this._timeoutId = 0;
+    }
+    this._label?.destroy();
+    this._label = null;
+  }
+}
+
 const NumericClockIndicator = GObject.registerClass(
 class NumericClockIndicator extends PanelMenu.Button {
   _init(settings, extensionPath, openPrefs) {
-    super._init(0.0, 'Numeric Clock');
+    super._init(0.0, _('Numeric Clock'));
     this.add_style_class_name('numeric-clock-panel');
     this._settings = settings;
     this._openPrefs = openPrefs;
@@ -105,11 +139,10 @@ class NumericClockIndicator extends PanelMenu.Button {
     const icon = new St.Icon({
       gicon: Gio.Icon.new_for_string(iconPath),
       style_class: 'system-status-icon numeric-clock-icon',
-      icon_size: 18,
     });
     this.add_child(icon);
-    if (typeof this.set_tooltip_text === 'function')
-      this.set_tooltip_text(PANEL_TOOLTIP);
+    this._tooltip = new Tooltip(this,
+      () => `${_('Numeric Clock')} — ${formatNow(this._settings.get_string('format-string'))}`);
     this._buildMenu();
 
     this._settingsChangedIds = [
@@ -121,6 +154,7 @@ class NumericClockIndicator extends PanelMenu.Button {
 
   destroy() {
     this._clearMenuTimer();
+    this._tooltip.hide();
     for (const id of this._settingsChangedIds || []) {
       try { this._settings.disconnect(id); } catch {}
     }
@@ -129,8 +163,7 @@ class NumericClockIndicator extends PanelMenu.Button {
   }
 
   _syncVisibility() {
-    const show = this._settings.get_boolean('show-panel-icon');
-    this.visible = show;
+    this.visible = this._settings.get_boolean('show-panel-icon');
   }
 
   _clearMenuTimer() {
@@ -154,196 +187,66 @@ class NumericClockIndicator extends PanelMenu.Button {
     });
   }
 
-  openQuickMenu() {
-    this.menu.open();
+  // With the panel icon hidden, anchor the menu to the clock that was clicked.
+  openQuickMenu(anchor) {
+    this.menu.sourceActor = this.visible || !anchor ? this : anchor;
+    this.menu.toggle();
   }
 
   _buildMenu() {
     this.menu.removeAll();
     this._timeLabel = new PopupMenu.PopupMenuItem('', { reactive: false, can_focus: false });
-    this._timeLabel.label.clutter_text.ellipsize = 3;
+    this._timeLabel.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     this.menu.addMenuItem(this._timeLabel);
 
     this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-    const prefsItem = menuItemWithIcon('Open Preferences', 'preferences-system-symbolic');
-    prefsItem.connect('activate', () => this._openPrefs());
-    this.menu.addMenuItem(prefsItem);
-
-    const copyItem = menuItemWithIcon('Copy current time', 'edit-copy-symbolic');
+    const copyItem = menuItemWithIcon(_('Copy current time'), 'edit-copy-symbolic');
     copyItem.connect('activate', () => {
       copyTextToClipboard(formatNow(this._settings.get_string('format-string')));
     });
     this.menu.addMenuItem(copyItem);
 
-    const presets = new PopupMenu.PopupSubMenuMenuItem('Quick presets', true);
+    const presets = new PopupMenu.PopupSubMenuMenuItem(_('Quick presets'), true);
     if (presets.icon)
       presets.icon.icon_name = 'document-edit-symbolic';
     for (const preset of FORMAT_PRESETS) {
-      const item = new PopupMenu.PopupMenuItem(preset.label);
+      const item = new PopupMenu.PopupMenuItem(_(preset.label));
       item.connect('activate', () => {
         applyPresetToSettings(this._settings, preset);
         this._refreshMenuTime();
-        Main.notify('Numeric Clock', 'Format preset applied');
+        Main.notify(_('Numeric Clock'), `${_('Format preset applied')}: ${_(preset.label)}`);
       });
       presets.menu.addMenuItem(item);
     }
     this.menu.addMenuItem(presets);
 
+    this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+    const prefsItem = menuItemWithIcon(_('Preferences'), 'preferences-system-symbolic');
+    prefsItem.connect('activate', () => this._openPrefs());
+    this.menu.addMenuItem(prefsItem);
+
     this.menu.connect('open-state-changed', (_menu, open) => {
-      if (open)
+      if (open) {
+        this._tooltip.hide();
         this._startMenuTimer();
-      else
+      } else {
         this._clearMenuTimer();
+      }
     });
   }
 });
 
 export default class NumericClockExtension extends Extension {
-  constructor(uuid) {
-    super(uuid);
-    this._settings = null;
-    this._indicator = null;
-    this._timeoutId = 0;
-    this._msTimeoutId = 0;
-    this._stageAddedId = 0;
-    this._stageRemovedId = 0;
-    this._settingsChangedIds = [];
-    this._textSignalIds = [];
-    this._clickSignalIds = [];
-  }
-
-  _collectClockLabels() {
-    const set = new Set();
-    const dm = Main.panel && Main.panel.statusArea ? Main.panel.statusArea.dateMenu : null;
-    if (dm) {
-      if (dm._clockDisplay instanceof St.Label) set.add(dm._clockDisplay);
-      if (dm._clock        instanceof St.Label) set.add(dm._clock);
-      if (dm._time         instanceof St.Label) set.add(dm._time);
-    }
-    if (this._settings && this._settings.get_boolean('only-topbar'))
-      return Array.from(set);
-    for (const lab of allStageLabels()) {
-      const cls  = (typeof lab.get_style_class_name === 'function' ? lab.get_style_class_name() : '') || '';
-      const name = (typeof lab.get_name === 'function' ? lab.get_name() : '') || '';
-      const lcCls  = cls.toLowerCase();
-      const lcName = name.toLowerCase();
-      const txt  = typeof lab.get_text === 'function' ? lab.get_text() : '';
-      if (lcCls.includes('clock') || lcName.includes('clock') ||
-          lcCls.includes('date')  || lcName.includes('date')  ||
-          looksLikeClock(txt))
-        set.add(lab);
-    }
-    return Array.from(set);
-  }
-
-  _forcePlain(lab) {
-    const ct = lab && lab.clutter_text;
-    if (ct && typeof ct.set_use_markup === 'function')
-      ct.set_use_markup(false);
-  }
-
-  _hookClockClick(lab) {
-    if (!lab || lab[CLICK_HOOKED] || !this._indicator) return;
-    lab[CLICK_HOOKED] = true;
-    lab.reactive = true;
-    lab.track_hover = true;
-    const id = lab.connect('button-press-event', (_actor, event) => {
-      if (!this._settings?.get_boolean('clock-secondary-opens-menu'))
-        return Clutter.EVENT_PROPAGATE;
-      const btn = event.get_button();
-      if (btn === Clutter.BUTTON_SECONDARY || btn === Clutter.BUTTON_MIDDLE) {
-        this._indicator.openQuickMenu();
-        return Clutter.EVENT_STOP;
-      }
-      return Clutter.EVENT_PROPAGATE;
-    });
-    this._clickSignalIds.push([lab, id]);
-    if (this._settings?.get_boolean('clock-secondary-opens-menu') &&
-        typeof lab.set_tooltip_text === 'function')
-      lab.set_tooltip_text('Right-click for Numeric Clock menu');
-  }
-
-  _unhookClockClick(lab) {
-    if (!lab) return;
-    try { delete lab[CLICK_HOOKED]; } catch {}
-    if (typeof lab.set_tooltip_text === 'function')
-      lab.set_tooltip_text(null);
-  }
-
-  _applyTo(lab) {
-    if (!lab) return;
-    this._forcePlain(lab);
-    if (typeof lab.set_text === 'function')
-      lab.set_text(formatNow(this._settings.get_string('format-string')));
-
-    const ct = lab && lab.clutter_text;
-    if (ct && !ct[HOOKED] && typeof ct.connect === 'function') {
-      ct[HOOKED] = true;
-      const id = ct.connect('notify::text', () => {
-        this._forcePlain(lab);
-        if (typeof lab.set_text === 'function')
-          lab.set_text(formatNow(this._settings.get_string('format-string')));
-      });
-      this._textSignalIds.push([ct, id]);
-    }
-    this._hookClockClick(lab);
-  }
-
-  _refreshClockTooltips() {
-    const showTip = this._settings.get_boolean('clock-secondary-opens-menu');
-    for (const lab of this._collectClockLabels()) {
-      if (typeof lab.set_tooltip_text !== 'function') continue;
-      lab.set_tooltip_text(showTip ? 'Right-click for Numeric Clock menu' : null);
-    }
-  }
-
-  _updateAllNow() {
-    for (const lab of this._collectClockLabels())
-      this._applyTo(lab);
-    this._refreshClockTooltips();
-  }
-
-  _restartTimer() {
-    if (this._timeoutId) {
-      GLib.source_remove(this._timeoutId);
-      this._timeoutId = 0;
-    }
-    if (this._msTimeoutId) {
-      GLib.source_remove(this._msTimeoutId);
-      this._msTimeoutId = 0;
-    }
-    const sec = Math.max(1, this._settings.get_int('update-interval'));
-    this._updateAllNow();
-    const smooth = !!this._settings.get_boolean('smooth-second');
-    if (smooth && sec === 1) {
-      const now = GLib.DateTime.new_now_local();
-      const delayMs = 1000 - Math.floor(now.get_microsecond() / 1000);
-      this._msTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, delayMs, () => {
-        this._updateAllNow();
-        this._timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, sec, () => {
-          this._updateAllNow();
-          return GLib.SOURCE_CONTINUE;
-        });
-        this._msTimeoutId = 0;
-        return GLib.SOURCE_REMOVE;
-      });
-    } else {
-      this._timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, sec, () => {
-        this._updateAllNow();
-        return GLib.SOURCE_CONTINUE;
-      });
-    }
-  }
-
-  _syncIndicator() {
-    if (!this._indicator) return;
-    const show = this._settings.get_boolean('show-panel-icon');
-    this._indicator.visible = show;
-  }
-
   enable() {
     this._settings = this.getSettings();
+    // Hooked label -> { ct, textId, clickId, destroyId, reactive }
+    this._labels = new Map();
+    this._timeoutId = 0;
+    this._ticks = 0;
+    this._rescanIdleId = 0;
+    this._applying = false;
 
     this._indicator = new NumericClockIndicator(
       this._settings,
@@ -352,71 +255,181 @@ export default class NumericClockExtension extends Extension {
     );
     Main.panel.addToStatusArea('numeric-clock-access', this._indicator, 1, 'right');
 
-    this._settingsChangedIds.push(
-      this._settings.connect('changed::format-string', () => this._updateAllNow()),
+    this._settingsChangedIds = [
+      this._settings.connect('changed::format-string', () => this._updateAll()),
       this._settings.connect('changed::update-interval', () => this._restartTimer()),
       this._settings.connect('changed::smooth-second', () => this._restartTimer()),
-      this._settings.connect('changed::only-topbar', () => this._updateAllNow()),
-      this._settings.connect('changed::show-panel-icon', () => this._syncIndicator()),
-      this._settings.connect('changed::clock-secondary-opens-menu', () => this._refreshClockTooltips()),
-    );
-    this._stageAddedId = connectStageSignal(global.stage, 'added', () => this._updateAllNow());
-    this._stageRemovedId = connectStageSignal(global.stage, 'removed', () => this._updateAllNow());
+      this._settings.connect('changed::only-topbar', () => {
+        this._unhookAll();
+        this._restoreDateMenu();
+        this._restartTimer();
+      }),
+    ];
+    // Stage children come and go with panels and docks; look again once idle.
+    this._stageSignalIds = [['child-added', 'actor-added'], ['child-removed', 'actor-removed']]
+      .map(names => connectFirst(global.stage, names, () => this._queueRescan()))
+      .filter(id => id);
     this._restartTimer();
-    this._syncIndicator();
   }
 
   disable() {
-    if (this._indicator) {
-      this._indicator.destroy();
-      this._indicator = null;
+    this._clearTimer();
+    if (this._rescanIdleId) {
+      GLib.source_remove(this._rescanIdleId);
+      this._rescanIdleId = 0;
     }
+    for (const id of this._stageSignalIds)
+      global.stage.disconnect(id);
+    this._stageSignalIds = null;
+    for (const id of this._settingsChangedIds)
+      this._settings.disconnect(id);
+    this._settingsChangedIds = null;
 
-    if (this._timeoutId) GLib.source_remove(this._timeoutId);
-    this._timeoutId = 0;
-    if (this._msTimeoutId) GLib.source_remove(this._msTimeoutId);
-    this._msTimeoutId = 0;
-
-    for (const id of this._settingsChangedIds) {
-      try { this._settings.disconnect(id); } catch {}
-    }
-    this._settingsChangedIds = [];
-
-    if (this._stageAddedId)   { disconnectStageSignal(global.stage, this._stageAddedId);   this._stageAddedId = 0; }
-    if (this._stageRemovedId) { disconnectStageSignal(global.stage, this._stageRemovedId); this._stageRemovedId = 0; }
-
-    for (const [actor, id] of this._textSignalIds) {
-      try { actor.disconnect(id); } catch {}
-      try { delete actor[HOOKED]; } catch {}
-    }
-    this._textSignalIds = [];
-
-    for (const [lab, id] of this._clickSignalIds) {
-      try { lab.disconnect(id); } catch {}
-      this._unhookClockClick(lab);
-    }
-    this._clickSignalIds = [];
-
-    this._restoreDefaultClocks();
+    this._unhookAll();
+    this._labels = null;
+    this._indicator.destroy();
+    this._indicator = null;
+    this._restoreDateMenu();
     this._settings = null;
   }
 
-  _restoreDefaultClocks() {
-    const dm = Main.panel?.statusArea?.dateMenu;
-    if (dm) {
-      for (const method of ['_updateClock', '_updateClockDisplay', '_update']) {
-        if (typeof dm[method] === 'function') {
-          try { dm[method](); break; } catch {}
+  _dateMenu() {
+    return Main.panel?.statusArea?.dateMenu ?? null;
+  }
+
+  _candidateLabels() {
+    const out = [];
+    const dm = this._dateMenu();
+    if (dm?._clockDisplay instanceof St.Label)
+      out.push(dm._clockDisplay);
+    if (this._settings.get_boolean('only-topbar'))
+      return out;
+    const skip = new Set([this._indicator.menu.actor, Main.messageTray]);
+    if (dm?.menu?.actor)
+      skip.add(dm.menu.actor);
+    for (const lab of stageLabels(skip)) {
+      if (!this._labels.has(lab) && looksLikeClock(lab))
+        out.push(lab);
+    }
+    return out;
+  }
+
+  _scan() {
+    for (const lab of this._candidateLabels())
+      this._hook(lab);
+  }
+
+  _queueRescan() {
+    if (this._rescanIdleId || this._settings.get_boolean('only-topbar'))
+      return;
+    this._rescanIdleId = GLib.idle_add(GLib.PRIORITY_LOW, () => {
+      this._rescanIdleId = 0;
+      this._scan();
+      this._updateAll();
+      return GLib.SOURCE_REMOVE;
+    });
+  }
+
+  _hook(lab) {
+    if (this._labels.has(lab)) return;
+    const ct = lab.clutter_text;
+    const entry = { ct, textId: 0, clickId: 0, destroyId: 0, reactive: lab.reactive };
+    // Plain text only: never let a format string inject Pango markup.
+    ct.set_use_markup(false);
+    // The shell rewrites the clock text on its own schedule; put ours back.
+    entry.textId = ct.connect('notify::text', () => {
+      if (!this._applying)
+        this._apply(lab);
+    });
+    entry.destroyId = lab.connect('destroy', () => this._labels?.delete(lab));
+    if (Main.panel.contains(lab)) {
+      lab.reactive = true;
+      entry.clickId = lab.connect('button-press-event', (_actor, event) => {
+        if (!this._settings.get_boolean('clock-secondary-opens-menu'))
+          return Clutter.EVENT_PROPAGATE;
+        const btn = event.get_button();
+        if (btn === Clutter.BUTTON_SECONDARY || btn === Clutter.BUTTON_MIDDLE) {
+          this._indicator.openQuickMenu(lab);
+          return Clutter.EVENT_STOP;
         }
+        return Clutter.EVENT_PROPAGATE;
+      });
+    }
+    this._labels.set(lab, entry);
+    this._apply(lab);
+  }
+
+  _unhookAll() {
+    for (const [lab, e] of this._labels) {
+      e.ct.disconnect(e.textId);
+      lab.disconnect(e.destroyId);
+      if (e.clickId) {
+        lab.disconnect(e.clickId);
+        lab.reactive = e.reactive;
       }
     }
-    for (const lab of this._collectClockLabels()) {
-      if (!lab || typeof lab.set_text !== 'function') continue;
-      try {
-        const ct = lab.clutter_text;
-        if (ct && ct[HOOKED]) delete ct[HOOKED];
-      } catch {}
-      this._unhookClockClick(lab);
+    this._labels.clear();
+  }
+
+  _apply(lab) {
+    const text = formatNow(this._settings.get_string('format-string'));
+    if (lab.get_text() === text) return;
+    this._applying = true;
+    try {
+      lab.set_text(text);
+    } finally {
+      this._applying = false;
     }
+  }
+
+  _updateAll() {
+    for (const lab of this._labels.keys())
+      this._apply(lab);
+  }
+
+  _tick() {
+    if (this._ticks++ % RESCAN_TICKS === 0 || this._labels.size === 0)
+      this._scan();
+    this._updateAll();
+  }
+
+  _clearTimer() {
+    if (this._timeoutId) {
+      GLib.source_remove(this._timeoutId);
+      this._timeoutId = 0;
+    }
+  }
+
+  _restartTimer() {
+    this._clearTimer();
+    this._ticks = 0;
+    this._tick();
+    const sec = Math.max(1, this._settings.get_int('update-interval'));
+    if (this._settings.get_boolean('smooth-second'))
+      this._scheduleAligned(sec);
+    else
+      this._timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, sec, () => {
+        this._tick();
+        return GLib.SOURCE_CONTINUE;
+      });
+  }
+
+  // Fire just after each whole-second boundary. timeout_add_seconds() is not
+  // used here because GLib shifts it by a per-session offset, which would make
+  // the displayed seconds lag the real ones by up to a second.
+  _scheduleAligned(sec) {
+    const ms = Math.floor(GLib.get_real_time() / 1000) % 1000;
+    this._timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, sec * 1000 - ms + 5, () => {
+      this._tick();
+      this._scheduleAligned(sec);
+      return GLib.SOURCE_REMOVE;
+    });
+  }
+
+  // Put the stock GNOME clock text back right away instead of at its next tick.
+  _restoreDateMenu() {
+    const dm = this._dateMenu();
+    if (dm?._clockDisplay && typeof dm._clock?.clock === 'string')
+      dm._clockDisplay.text = dm._clock.clock;
   }
 }

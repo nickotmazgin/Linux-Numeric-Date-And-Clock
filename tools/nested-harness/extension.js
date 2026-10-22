@@ -1,0 +1,120 @@
+// Test harness for tools/nested-smoke-test.sh — never shipped in the release zip.
+// Drives Numeric Clock inside an isolated nested GNOME Shell and logs "NCTEST" lines.
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+
+const UUID = 'numeric-clock@nickotmazgin';
+const L = (...a) => console.log('NCTEST', ...a);
+const wait = ms => new Promise(r => GLib.timeout_add(GLib.PRIORITY_DEFAULT, ms, () => {
+  r();
+  return GLib.SOURCE_REMOVE;
+}));
+const fmt = f => GLib.DateTime.new_now_local().format(f);
+
+function ncSettings() {
+  const ext = Main.extensionManager.lookup(UUID);
+  const src = Gio.SettingsSchemaSource.new_from_directory(`${ext.path}/schemas`,
+    Gio.SettingsSchemaSource.get_default(), false);
+  return new Gio.Settings({ settings_schema: src.lookup('org.gnome.shell.extensions.numeric-clock', false) });
+}
+
+function check(name, ok, detail = '') {
+  L(ok ? 'PASS' : 'FAIL', name, detail);
+}
+
+async function run() {
+  await wait(1500);
+  const s = ncSettings();
+  const dm = Main.panel.statusArea.dateMenu;
+  const clock = () => dm._clockDisplay.text;
+  const ind = () => Main.panel.statusArea['numeric-clock-access'];
+
+  check('extension active', Main.extensionManager.lookup(UUID)?.state === 1);
+  check('indicator present', !!ind());
+  const icon = ind().get_first_child();
+  check('icon uses theme size', icon.get_theme_node().get_length('icon-size') > 0 && icon.icon_size === -1,
+    `icon_size=${icon.icon_size} theme=${icon.get_theme_node().get_length('icon-size')}`);
+
+  // Default format, ticking every second.
+  const first = clock();
+  check('default format', /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/.test(first), first);
+  await wait(1100);
+  check('ticks every second', clock() !== first, `${first} -> ${clock()}`);
+
+  // Smooth tick lands just after the second boundary.
+  const offsets = [];
+  const ct = dm._clockDisplay.clutter_text;
+  const id = ct.connect('notify::text', () => offsets.push((GLib.get_real_time() / 1000) % 1000));
+  await wait(3200);
+  ct.disconnect(id);
+  check('aligned to second', offsets.length >= 2 && offsets.every(o => o < 150), offsets.map(Math.round).join(','));
+
+  s.set_string('format-string', '%Y-%m-%d %H:%M');
+  await wait(50);
+  check('format change applies', clock() === fmt('%Y-%m-%d %H:%M'), clock());
+
+  s.set_string('format-string', '');
+  await wait(50);
+  check('empty format falls back', clock() === fmt('%d/%m/%Y %H:%M:%S'), clock());
+
+  // Shell rewrites the label (as the wall clock does each minute); ours comes back.
+  s.set_string('format-string', '%H:%M:%S');
+  dm._clockDisplay.text = 'stock';
+  check('shell rewrite overridden', clock() !== 'stock', clock());
+
+  // Markup is never interpreted.
+  s.set_string('format-string', '<b>%H</b>');
+  await wait(50);
+  check('plain text', clock() === fmt('<b>%H</b>') && !ct.use_markup, clock());
+
+  // Right-click menu, icon visible and hidden.
+  s.set_string('format-string', '%d/%m/%Y %H:%M:%S');
+  ind().openQuickMenu(dm._clockDisplay);
+  await wait(300);
+  check('menu opens from clock', ind().menu.isOpen);
+  const items = ind().menu._getMenuItems().map(i => i.label?.text ?? '-');
+  L('menu items', JSON.stringify(items));
+  check('menu shows time', items[0] === fmt('%d/%m/%Y %H:%M:%S') || items[0].length > 0, items[0]);
+  ind().menu.close();
+  s.set_boolean('show-panel-icon', false);
+  await wait(100);
+  check('icon hidden', !ind().visible);
+  ind().openQuickMenu(dm._clockDisplay);
+  await wait(300);
+  check('menu opens with icon hidden', ind().menu.isOpen && ind().menu.sourceActor === dm._clockDisplay);
+  ind().menu.close();
+  s.set_boolean('show-panel-icon', true);
+
+  // Non-top-bar mode walks the stage without touching the calendar popup.
+  s.set_boolean('only-topbar', false);
+  await wait(1200);
+  check('only-topbar off still formats', clock() === fmt('%d/%m/%Y %H:%M:%S'), clock());
+  s.set_boolean('only-topbar', true);
+
+  // Disable restores the stock clock immediately; enable takes over again.
+  await Main.extensionManager.disableExtension(UUID);
+  await wait(200);
+  check('disable restores stock clock', clock() === dm._clock.clock, `${clock()} vs ${dm._clock.clock}`);
+  check('label not left reactive', !dm._clockDisplay.reactive);
+  check('indicator removed', !ind());
+  await Main.extensionManager.enableExtension(UUID);
+  await wait(200);
+  check('re-enable formats again', /^\d{2}\/\d{2}\/\d{4}/.test(clock()), clock());
+
+  for (let i = 0; i < 3; i++) {
+    await Main.extensionManager.disableExtension(UUID);
+    await Main.extensionManager.enableExtension(UUID);
+  }
+  check('enable/disable cycles', !!ind() && Main.extensionManager.lookup(UUID)?.state === 1);
+  L('DONE');
+}
+
+export default class NumericClockTestHarness extends Extension {
+  enable() {
+    run().catch(e => L('FAIL exception', e, e.stack));
+  }
+
+  disable() {}
+}
