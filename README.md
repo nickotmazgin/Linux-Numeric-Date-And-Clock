@@ -289,6 +289,7 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 ./tools/build.sh                # -> dist/numeric-clock@nickotmazgin.v30.shell-extension.zip (GNOME 45–51)
 ./tools/validate.sh
 ./tools/nested-smoke-test.sh    # isolated nested GNOME Shell run; prints PASSED/FAILED
+python3 tools/media/demo_video.py  # narrated 1080p demo video (tools/media/README.md)
 npx -y eslint@9 .               # lint (same as CI)
 ```
 

@@ -15,6 +15,7 @@ Bug reports, ideas and pull requests are welcome. For security issues, see
 | `tools/build.sh` | Builds `dist/numeric-clock@nickotmazgin.v<version>.shell-extension.zip` |
 | `tools/validate.sh` | Checks the built zip against `src/metadata.json` |
 | `tools/nested-smoke-test.sh` | Runs the built zip in an isolated nested GNOME Shell |
+| `tools/media/` | Narrated demo video, made in a nested shell ([README](tools/media/README.md)) |
 
 ## Development loop
 
