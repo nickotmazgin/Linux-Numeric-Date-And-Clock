@@ -43,9 +43,9 @@ Stock GNOME shows `Oct 22  13:17` and offers no date-format setting. Numeric Clo
 
 ## Screenshots
 
-*Numeric Clock v17.4.4 — click any image to view it full size.*
+*Numeric Clock v17.5.0 on GNOME Shell — click any image to view it full size.*
 
-[![Numeric Clock v17.4.4 collage](screenshots/collage.jpg)](screenshots/collage.jpg)
+[![Numeric Clock v17.5.0 collage](screenshots/collage.jpg)](screenshots/collage.jpg)
 
 <table>
   <tr>

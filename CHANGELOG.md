@@ -20,6 +20,7 @@
 - Repository: ESLint + ShellCheck CI, nested GNOME Shell smoke test (`tools/nested-smoke-test.sh`), deterministic `tools/build.sh`, `tools/validate.sh` checks the zip against `src/metadata.json`, CONTRIBUTING, Code of Conduct, SUPPORT, release checklist, Discussions link in the issue chooser
 - Release zips now get a Sigstore build-provenance attestation (`gh attestation verify`), like EaseHub
 - Panel icon uses the Adwaita symbolic fill color like the other extensions
+- New HD screenshots, collage and social preview for v17.5.0; README FAQ, keywords and topics for search
 
 > **Recommended upgrade** for everyone on v17.4.4 and earlier.
 
