@@ -1,0 +1,4 @@
+/* Numeric Clock. The panel icon takes its size and color from the shell
+   theme's system-status-icon class; this only styles the hover tooltip. */
+
+.numeric-clock-tooltip { font-size: 0.9em; }

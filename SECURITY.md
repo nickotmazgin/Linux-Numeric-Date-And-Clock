@@ -7,11 +7,11 @@ We maintain security fixes for the currently released builds of Numeric Clock:
 
 | Extension branch | GNOME Shell | Version line | Status              |
 | ---------------- | ----------- | ------------ | ------------------- |
-| `main`           | 45–50       | **v17.x**    | Actively supported  |
+| `main`           | 45–51       | **v17.x**    | Actively supported  |
 
 GNOME Shell **42–44** support has ended. Upgrade to GNOME **45** or newer.
 
-**Platforms:** GNOME Shell **45–50** on **Wayland** (supported) and **X11/Xorg** (supported; **v17.4.4 validated** on maintainer X11 setup).
+**Platforms:** GNOME Shell **45–51** on **Wayland** (supported; nested-shell smoke tested) and **X11/Xorg** (supported; validated on maintainer X11 setup).
 
 ## Reporting a vulnerability
 

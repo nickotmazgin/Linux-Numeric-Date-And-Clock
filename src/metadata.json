@@ -1,6 +1,6 @@
 {
   "name": "Numeric Clock",
-  "description": "Top-bar numeric DD/MM/YYYY 24-hour clock. GNOME Shell 45–50. X11/Xorg validated on maintainer setup; Wayland supported.",
+  "description": "Top-bar numeric clock for GNOME Shell 45–51: DD/MM/YYYY, ISO 8601, 24-hour or 12-hour time with optional seconds, using any strftime format.\n\n* 8 one-click presets and a live preview\n* Panel icon and right-click menu: presets, copy time, preferences\n* Ticks exactly on the second\n* Restores the stock clock when disabled\n\nWayland & X11/Xorg. No network access.",
   "uuid": "numeric-clock@nickotmazgin",
   "shell-version": [
     "45",
@@ -8,11 +8,11 @@
     "47",
     "48",
     "49",
-    "50"
+    "50",
+    "51"
   ],
-  "version": 28,
-  "version-name": "17.4.4 45.50",
-  "icon": "numeric-clock-symbolic",
+  "version": 29,
+  "version-name": "17.5.0 45.51",
   "settings-schema": "org.gnome.shell.extensions.numeric-clock",
   "gettext-domain": "numeric-clock",
   "url": "https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock",

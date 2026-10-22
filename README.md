@@ -1,29 +1,32 @@
-# Numeric Clock (GNOME Shell Extension)
+# Numeric Clock — numeric date & time for the GNOME top bar
 
 [![Release](https://img.shields.io/github/v/release/nickotmazgin/Linux-Numeric-Date-And-Clock?display_name=tag&label=release)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/nickotmazgin/Linux-Numeric-Date-And-Clock/validate.yml?branch=main&label=CI)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/actions)
 [![Downloads](https://img.shields.io/github/downloads/nickotmazgin/Linux-Numeric-Date-And-Clock/total?label=downloads&color=success)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases)
 [![License: MIT](https://img.shields.io/github/license/nickotmazgin/Linux-Numeric-Date-And-Clock)](LICENSE)
-[![GNOME 45–50](https://img.shields.io/badge/GNOME-45%E2%80%9350-4A86CF?logo=gnome&logoColor=white)](#compatibility)
+[![GNOME 45–51](https://img.shields.io/badge/GNOME-45%E2%80%9351-4A86CF?logo=gnome&logoColor=white)](#compatibility)
 [![ESM](https://img.shields.io/badge/ESM-GJS%20modules-orange)](#compatibility)
 [![Wayland](https://img.shields.io/badge/Wayland-supported-0078D4)](#compatibility)
 [![X11 / Xorg](https://img.shields.io/badge/X11%20%2F%20Xorg-validated-555555)](#compatibility)
 
 [![Issues](https://img.shields.io/github/issues/nickotmazgin/Linux-Numeric-Date-And-Clock)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
 [![Discussions](https://img.shields.io/github/discussions/nickotmazgin/Linux-Numeric-Date-And-Clock?label=discussions&color=8B5CF6)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
+[![Stars](https://img.shields.io/github/stars/nickotmazgin/Linux-Numeric-Date-And-Clock?style=flat&color=yellow)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/stargazers)
 [![i18n](https://img.shields.io/badge/i18n-gettext-blue)](#features)
 
-A lightweight GNOME Shell extension that replaces the top-bar clock with a **numeric, fully configurable** format — ideal for **DD/MM/YYYY**, **ISO 8601**, **24-hour**, or **12-hour** time with optional **seconds**, anywhere in the world.
+A lightweight **GNOME Shell extension** that turns the top-bar clock into a **numeric, fully configurable date and time** — **DD/MM/YYYY**, **ISO 8601 (YYYY-MM-DD)**, **24-hour** or **12-hour** time, with **seconds**, **weekday** or **ISO week number** — using any `strftime` format, anywhere in the world.
 
-**Latest:** v17.4.4 — ESM build v28 for **GNOME 45–50** (**X11/Xorg validated** on Zorin OS 18.1 / GNOME Shell 46)
+Stock GNOME shows `Oct 22  13:17` and offers no date-format setting. Numeric Clock shows `22/10/2026 13:17:05` (or whatever you choose), ticks exactly on the second, and puts the stock clock back the moment you disable it.
 
-> Download only [v17.4.4](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older stable releases (v17.3.x) are kept for rollback. **No new extension release is required** for docs/CI-only updates on `main` since v17.4.4.
+**Latest:** v17.5.0 — ESM build v29 for **GNOME 45–51** (**X11/Xorg validated** on Zorin OS 18.1 / GNOME Shell 46)
+
+> Download [v17.5.0](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest). Older stable releases are kept for rollback. See [CHANGELOG.md](CHANGELOG.md) for what changed.
 
 **UUID:** `numeric-clock@nickotmazgin`
 
-> **Keywords:** GNOME clock · numeric date · DD/MM/YYYY · ISO 8601 · 24-hour time · Wayland · X11 · Xorg · top bar · Linux desktop · open source
+> **Keywords:** GNOME clock format · GNOME top bar date · numeric date · DD/MM/YYYY · ISO 8601 · 24-hour clock · seconds in top bar · week number · strftime · custom date format · GNOME Shell extension · Ubuntu · Fedora · Zorin OS · Wayland · X11 · Xorg · open source
 
-> **GNOME Shell 42–44 is no longer supported.** Numeric Clock requires **GNOME 45–50**.
+> **GNOME Shell 42–44 is no longer supported.** Numeric Clock requires **GNOME 45–51**.
 
 ---
 
@@ -32,6 +35,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 * **Latest release (ZIPs):** [GitHub Releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
 * **Privacy:** [PRIVACY.md](PRIVACY.md)
 * **Security:** [SECURITY.md](SECURITY.md)
+* **Support:** [SUPPORT.md](.github/SUPPORT.md) · **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md)
 * **Issues:** [Report a bug](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
 * **Discussions:** [Ask a question](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
 
@@ -39,9 +43,9 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 ## Screenshots
 
-*Numeric Clock v17.4.4 — click any image to view it full size.*
+*Numeric Clock v17.5.0 on GNOME Shell — click any image to view it full size.*
 
-[![Numeric Clock v17.4.4 collage](screenshots/collage.jpg)](screenshots/collage.jpg)
+[![Numeric Clock v17.5.0 collage](screenshots/collage.jpg)](screenshots/collage.jpg)
 
 <table>
   <tr>
@@ -76,13 +80,13 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 * Fully numeric date/time — you choose the `strftime` **format string**
 * **International defaults:** `DD/MM/YYYY HH:MM:SS` (24-hour, seconds; uses your **system locale and timezone**)
-* **7 format presets:** International, weekday, compact, time-only, ISO 8601, US 12-hour, top-bar only
-* **Live preview** in settings — ticks every second when format shows seconds
+* **8 format presets:** International, weekday, compact, time-only, ISO 8601, ISO + week number, US 12-hour, top-bar only — each shows a live sample
+* **Live preview** in settings, a built-in **format codes** cheat sheet, and invalid formats flagged (the clock falls back to the default instead of going blank)
 * Configurable **update interval** (1–300 seconds)
-* **Smooth second tick** alignment when showing seconds
-* **Panel access icon** — digital clock icon opens a quick menu (preferences, presets, copy time)
+* **Smooth tick** — updates land exactly on each second boundary
+* **Panel access icon** — clock icon (with a live-time tooltip) opens a quick menu: presets, copy time, preferences
 * **Right-click the formatted clock** for the same quick menu (left-click still opens GNOME calendar)
-* **Restore default clock** when disabled or uninstalled
+* **Restores the stock clock immediately** when disabled or uninstalled
 * Safe plain-text rendering (no Pango markup)
 * No network access, telemetry, or external services — see [PRIVACY.md](PRIVACY.md)
 
@@ -92,19 +96,19 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 
 | GNOME | Status | Extension version | Notes |
 | ----- | ------ | ----------------: | ----- |
-| **45–50** | **Supported** | 28 | ESM build; do not ship `schemas/gschemas.compiled` |
+| **45–51** | **Supported** | 29 | ESM build; do not ship `schemas/gschemas.compiled` |
 | **42–44** | **Discontinued** | — | No longer built or maintained |
 
 | Session | Status | Notes |
 | ------- | ------ | ----- |
-| **X11 / Xorg** | **Supported · validated** | **v17.4.4** runtime-tested on Zorin OS 18.1 / GNOME Shell 46 / X11 |
-| **Wayland** | **Supported** | Works by design; not maintainer runtime-tested for v17.4.4 |
+| **X11 / Xorg** | **Supported · validated** | Runtime-tested on Zorin OS 18.1 / GNOME Shell 46 / X11 |
+| **Wayland** | **Supported** | **v17.5.0** passes the nested GNOME Shell (Wayland) smoke test |
 
 **Minimum requirement:** GNOME Shell **45** on a **Wayland or X11/Xorg** session.
 
-> **Validation scope (v17.4.4):** maintainer confidence is highest on **X11/Xorg** (local Zorin setup). Older release notes were not retroactively re-labeled.
+> **Validation scope (v17.5.0):** runtime-tested on GNOME Shell 46 (X11 desktop and a nested Wayland shell via `tools/nested-smoke-test.sh`). GNOME 47–51 support follows the official porting guides; Numeric Clock uses none of the APIs they removed.
 
-Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that ship Shell 45–50.
+Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that ship Shell 45–51.
 
 ---
 
@@ -112,8 +116,10 @@ Works on **Zorin OS**, Ubuntu, Fedora, and other GNOME-based distributions that 
 
 ### From GitHub release (recommended)
 
+Download **`numeric-clock@nickotmazgin.v29.shell-extension.zip`** from the [latest release](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest) (or `gh release download -R nickotmazgin/Linux-Numeric-Date-And-Clock`), then:
+
 ```bash
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v28.shell-extension.zip
+gnome-extensions install --force numeric-clock@nickotmazgin.v29.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 gnome-extensions prefs numeric-clock@nickotmazgin
 ```
@@ -123,7 +129,7 @@ gnome-extensions prefs numeric-clock@nickotmazgin
 ```bash
 ./tools/build.sh
 ./tools/validate.sh
-gnome-extensions install --force dist/numeric-clock@nickotmazgin.v28.shell-extension.zip
+gnome-extensions install --force dist/numeric-clock@nickotmazgin.v29.shell-extension.zip
 gnome-extensions enable numeric-clock@nickotmazgin
 ```
 
@@ -140,7 +146,8 @@ Open **Preferences** and set:
 * **Format string** — any `strftime` pattern
 * **Update interval (seconds)** — use `1` when showing seconds
 * **Smooth tick** — align updates to second boundaries
-* **Show panel access icon** — digital clock icon for quick menu
+* **Only change the top bar clock** — leave other panel/dock clocks alone (recommended)
+* **Show panel icon** — clock icon for the quick menu
 * **Right-click clock for quick menu** — secondary/middle click on the formatted clock
 
 Changes apply immediately as you type.
@@ -177,13 +184,35 @@ Or use the matching **preset buttons** in Preferences.
 
 ### Quick `strftime` cheatsheet
 
-`%A` weekday · `%a` short weekday · `%d` day · `%m` month · `%Y` year · `%H` hour (00–23) · `%I` hour (01–12) · `%p` AM/PM · `%M` minute · `%S` second
+`%A` weekday · `%a` short weekday · `%d` day · `%m` month · `%Y` year · `%H` hour (00–23) · `%I` hour (01–12) · `%p` AM/PM · `%M` minute · `%S` second · `%V` ISO week · `%j` day of year · `%Z` time zone
 
 Examples:
 
 * `%d/%m/%Y %H:%M:%S` → `30/05/2026 18:20:06`
 * `%Y-%m-%d %H:%M:%S` → `2026-05-30 18:20:06`
 * `%m/%d/%Y %I:%M:%S %p` → `05/30/2026 06:20:06 PM`
+
+---
+
+## FAQ
+
+**How do I show the date as DD/MM/YYYY in the GNOME top bar?**
+Install Numeric Clock — the default format is `%d/%m/%Y %H:%M:%S`. GNOME itself has no date-format setting for the top bar.
+
+**How do I show seconds in the GNOME clock?**
+Use any format with `%S` (the default does) and keep *Update interval* at `1` with *Smooth tick* on.
+
+**Can I use ISO 8601 (YYYY-MM-DD) or show the week number?**
+Yes — use the *ISO 8601* or *ISO date + week number* preset, or type `%Y-%m-%d W%V %H:%M`.
+
+**Does it work on Wayland and X11, Ubuntu, Fedora, Zorin OS?**
+Yes, on any distribution with GNOME Shell 45–51, in Wayland and X11/Xorg sessions.
+
+**Does it change my timezone or locale?**
+No. It only changes how the top-bar text looks; the time, timezone and month/day names come from your system settings.
+
+**Does it send any data anywhere?**
+No network access and no telemetry — see [PRIVACY.md](PRIVACY.md).
 
 ---
 
@@ -220,13 +249,15 @@ journalctl --user -b 0 -o cat | grep -i numeric-clock
 ## Packaging & releases (maintainers)
 
 ```bash
-./tools/build.sh    # -> dist/numeric-clock@nickotmazgin.v28.shell-extension.zip (GNOME 45–50)
+./tools/build.sh                # -> dist/numeric-clock@nickotmazgin.v29.shell-extension.zip (GNOME 45–51)
 ./tools/validate.sh
+./tools/nested-smoke-test.sh    # isolated nested GNOME Shell run; prints PASSED/FAILED
+npx -y eslint@9 .               # lint (same as CI)
 ```
 
 Tag `v*` to trigger CI upload of ZIPs to GitHub Releases.
 
-Do **not** commit `schemas/gschemas.compiled` to the repo.
+Do **not** commit `schemas/gschemas.compiled` to the repo. See [CONTRIBUTING.md](CONTRIBUTING.md) for the file layout.
 
 ---
 
@@ -262,24 +293,28 @@ MIT © Nick Otmazgin — see [LICENSE](LICENSE).
 
 Numeric Clock is created, maintained, signed, and released by **[Nick Otmazgin](https://github.com/nickotmazgin)** — the project's sole administrator and solo developer, who authors and reviews all code that ships.
 
+[![AI assisted — Claude Code](https://img.shields.io/badge/AI%20assisted-Claude%20Code-D97757)](https://claude.com/claude-code)
 [![AI assisted — OpenAI Codex](https://img.shields.io/badge/AI%20assisted-OpenAI%20Codex-10A37F)](https://openai.com/codex/)
 
 Recent releases were built with help from AI pair-programming agents, operated under the maintainer's direction and review:
 
 - **OpenAI Codex** — release engineering, signed-tag release workflows, release validation and CI hardening
 - **Cursor (Agent)** — code review, debugging, documentation
+- **Claude** by Anthropic ([@claude](https://github.com/claude), via [Claude Code](https://claude.com/claude-code)) — v17.5.0 audit: GNOME 51 port, second-accurate ticking, safer clock detection, redrawn icon, rebuilt preferences, nested-shell smoke test, lint CI
 
 Every AI-assisted change is human-reviewed, tested on real GNOME sessions, and approved by the maintainer before release. See [CONTRIBUTORS.md](CONTRIBUTORS.md) for the full credits.
 
-> OpenAI and Codex are trademarks of OpenAI. Cursor is a trademark of Anysphere, Inc. These names are used here solely for factual attribution. Numeric Clock is an independent project and is **not** affiliated with, sponsored, or endorsed by OpenAI or Anysphere/Cursor.
+> OpenAI and Codex are trademarks of OpenAI. Cursor is a trademark of Anysphere, Inc. Claude and Claude Code are trademarks of Anthropic, PBC. These names are used here solely for factual attribution. Numeric Clock is an independent project and is **not** affiliated with, sponsored, or endorsed by OpenAI, Anysphere/Cursor, or Anthropic.
 
 ---
 
 ## Find this project
 
-**GitHub topics:** `gnome-shell-extension` · `clock` · `24-hour` · `numeric-date` · `top-bar` · `seconds` · `wayland` · `x11` · `xorg` · `linux` · `open-source`
+**GitHub topics:** `gnome` · `gnome-shell` · `gnome-shell-extension` · `gnome-extension` · `linux` · `linux-desktop` · `clock` · `date-format` · `datetime` · `numeric-date` · `iso8601` · `24-hour` · `seconds` · `strftime` · `top-bar` · `wayland` · `x11` · `ubuntu` · `fedora` · `open-source`
 
-**Search for:** GNOME numeric clock, Linux top bar date format, DD/MM/YYYY clock extension, 24 hour clock GNOME
+**Search for:** GNOME numeric clock, GNOME top bar date format, change GNOME clock format, DD/MM/YYYY clock GNOME, ISO 8601 clock Linux, GNOME clock seconds, 24 hour clock GNOME, GNOME week number top bar
+
+**Also:** [Announcement & downloads discussion](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/9) · [Releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases) · [Changelog](CHANGELOG.md)
 
 ## More GNOME extensions by Nick Otmazgin
 

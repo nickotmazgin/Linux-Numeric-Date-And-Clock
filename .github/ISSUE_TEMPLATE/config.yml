@@ -1,1 +1,8 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions
+    about: Ask how to get a format, share a preset, or suggest something before filing an issue.
+  - name: Security report
+    url: https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/security/policy
+    about: Please report vulnerabilities privately, not as a public issue.

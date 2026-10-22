@@ -1,234 +1,223 @@
+// SPDX-License-Identifier: MIT
 // Numeric Clock prefs — GNOME 45+ (ESM)
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Gettext from 'gettext';
-import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-import { FORMAT_PRESETS, applyPresetToSettings } from './presets.js';
+import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import {
+  FORMAT_PRESETS, MAX_FORMAT_LENGTH, applyPresetToSettings,
+  formatNow, formatShowsSeconds, isValidFormat,
+} from './presets.js';
 
 const REPO_URL = 'https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock';
+const DONATE_URL = 'https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW';
 const EMAIL = 'nickotmazgin.dev@gmail.com';
 const AUTHOR = 'Nick Otmazgin';
+const SETTING_KEYS = [
+  'format-string', 'update-interval', 'only-topbar', 'smooth-second',
+  'show-panel-icon', 'clock-secondary-opens-menu',
+];
+const CHEATSHEET = [
+  ['%d / %m / %Y', 'Day · month · year (22 / 10 / 2026)'],
+  ['%H : %M : %S', '24-hour time (13:05:09)'],
+  ['%I %p', '12-hour clock with AM/PM'],
+  ['%a / %A', 'Short / full weekday'],
+  ['%b / %B', 'Short / full month name'],
+  ['%V / %j', 'ISO week number / day of year'],
+  ['%e / %-d', 'Day without leading zero'],
+  ['%Z', 'Time zone abbreviation'],
+];
+
+function launchUri(uri) {
+  try { Gio.AppInfo.launch_default_for_uri(uri, null); } catch (_e) {}
+}
+
+function switchRow(settings, key, title, subtitle) {
+  const row = new Adw.SwitchRow({ title, subtitle });
+  settings.bind(key, row, 'active', Gio.SettingsBindFlags.DEFAULT);
+  return row;
+}
 
 export default class NumericClockPrefs extends ExtensionPreferences {
   fillPreferencesWindow(window) {
     const settings = this.getSettings();
     const metadata = this.metadata || {};
-    window.default_width = 560;
-    window.default_height = 520;
+    window.default_width = 600;
+    window.default_height = 680;
+    window.search_enabled = true;
 
-    const _ = Gettext.domain('numeric-clock').gettext;
-
+    // ── Settings page ───────────────────────────────────────────────
     const pageSettings = new Adw.PreferencesPage({
       title: _('Settings'),
       icon_name: 'preferences-system-symbolic',
     });
-    const group = new Adw.PreferencesGroup({ title: _('Numeric Clock') });
 
-    const rowFmt = new Adw.ActionRow({ title: _('Format string') });
-    const entry = new Gtk.Entry({ hexpand: true, placeholder_text: '%d/%m/%Y %H:%M:%S' });
-    entry.text = settings.get_string('format-string');
-    entry.connect('changed', w => {
-      const text = String(w.text || '').slice(0, 128);
-      if (text !== w.text)
-        w.text = text;
-      settings.set_string('format-string', text);
+    const groupFormat = new Adw.PreferencesGroup({
+      title: _('Clock format'),
+      description: _('Uses your system locale and timezone'),
     });
-    rowFmt.add_suffix(entry);
-    rowFmt.activatable_widget = entry;
-    group.add(rowFmt);
 
-    const rowPreview = new Adw.ActionRow({
-      title: _('Preview'),
-      subtitle: _('Live sample — uses your system locale and timezone'),
-    });
-    const preview = new Gtk.Label({ hexpand: true, selectable: true, xalign: 1 });
+    const rowFmt = new Adw.EntryRow({ title: _('Format string') });
+    settings.bind('format-string', rowFmt, 'text', Gio.SettingsBindFlags.DEFAULT);
+    groupFormat.add(rowFmt);
+
+    const rowPreview = new Adw.ActionRow({ title: _('Preview') });
+    const preview = new Gtk.Label({ selectable: true, hexpand: true, xalign: 1, wrap: true, css_classes: ['numeric'] });
+    rowPreview.add_suffix(preview);
+    groupFormat.add(rowPreview);
+
+    // Live sample shown as each preset row's subtitle.
+    const presetRows = [];
     let previewTimer = 0;
-    function formatNow(fmt) {
-      try { return GLib.DateTime.new_now_local().format(fmt); }
-      catch (_) { return GLib.DateTime.new_now_local().format('%d/%m/%Y %H:%M:%S'); }
-    }
-    function formatShowsSeconds(fmt) {
-      return /%[0-9]*S|%[0-9]*T|%\d*[EOe]/.test(fmt || '');
-    }
-    function refreshPreview() {
+    const refreshPreview = () => {
       const fmt = settings.get_string('format-string');
+      const valid = isValidFormat(fmt);
       preview.label = formatNow(fmt);
-      const intervalSec = settings.get_int('update-interval');
-      const tickMs = formatShowsSeconds(fmt) || intervalSec <= 1 ? 1000 : Math.max(1000, intervalSec * 1000);
-      if (previewTimer)
-        GLib.source_remove(previewTimer);
-      previewTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, tickMs, () => {
-        preview.label = formatNow(settings.get_string('format-string'));
+      rowPreview.subtitle = valid
+        ? _('Live sample')
+        : _('Invalid or empty format — the clock shows the default format');
+      if (valid) rowFmt.remove_css_class('error');
+      else rowFmt.add_css_class('error');
+      for (const [row, preset] of presetRows)
+        row.subtitle = `${preset.fmt}  →  ${formatNow(preset.fmt)}`;
+    };
+    const restartPreviewTimer = () => {
+      if (previewTimer) GLib.source_remove(previewTimer);
+      const fmt = settings.get_string('format-string');
+      const sec = formatShowsSeconds(fmt) ? 1 : Math.min(60, Math.max(1, settings.get_int('update-interval')));
+      previewTimer = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, sec, () => {
+        refreshPreview();
         return GLib.SOURCE_CONTINUE;
       });
+      refreshPreview();
+    };
+
+    const cheatsheet = new Adw.ExpanderRow({
+      title: _('Format codes'),
+      subtitle: _('Common strftime codes — combine them freely'),
+    });
+    for (const [code, meaning] of CHEATSHEET) {
+      const row = new Adw.ActionRow({ title: code, subtitle: _(meaning) });
+      row.add_css_class('property');
+      cheatsheet.add_row(row);
     }
-    refreshPreview();
-    settings.connect('changed::format-string', refreshPreview);
-    settings.connect('changed::update-interval', refreshPreview);
-    rowPreview.add_suffix(preview);
-    group.add(rowPreview);
+    groupFormat.add(cheatsheet);
+    pageSettings.add(groupFormat);
 
-    const rowInt = new Adw.ActionRow({ title: _('Update interval (seconds)') });
-    const adj = new Gtk.Adjustment({ lower: 1, upper: 300, step_increment: 1, page_increment: 5, value: settings.get_int('update-interval') });
-    const spin = new Gtk.SpinButton({ adjustment: adj, numeric: true, halign: Gtk.Align.END });
-    const getVal = typeof spin.get_value_as_int === 'function'
-      ? () => spin.get_value_as_int()
-      : () => Math.round(spin.value);
-    spin.connect('value-changed', () => settings.set_int('update-interval', getVal()));
-    rowInt.add_suffix(spin);
-    rowInt.activatable_widget = spin;
-    group.add(rowInt);
-
-    const rowOnly = new Adw.ActionRow({
-      title: _('Only override top bar DateMenu'),
-      subtitle: _('Recommended. Turning off may affect other panel clocks on some desktops.'),
+    const groupBehavior = new Adw.PreferencesGroup({ title: _('Behavior') });
+    const rowInt = new Adw.SpinRow({
+      title: _('Update interval (seconds)'),
+      subtitle: _('Use 1 when the format shows seconds'),
+      adjustment: new Gtk.Adjustment({ lower: 1, upper: 300, step_increment: 1, page_increment: 5 }),
+      numeric: true,
     });
-    const swOnly = new Gtk.Switch({ active: settings.get_boolean('only-topbar') });
-    swOnly.connect('notify::active', w => settings.set_boolean('only-topbar', w.active));
-    rowOnly.add_suffix(swOnly);
-    rowOnly.activatable_widget = swOnly;
-    group.add(rowOnly);
+    settings.bind('update-interval', rowInt, 'value', Gio.SettingsBindFlags.DEFAULT);
+    groupBehavior.add(rowInt);
+    groupBehavior.add(switchRow(settings, 'smooth-second',
+      _('Smooth tick'),
+      _('Update exactly on each second boundary')));
+    groupBehavior.add(switchRow(settings, 'only-topbar',
+      _('Only change the top bar clock'),
+      _('Recommended. When off, other panel and dock clocks are formatted too.')));
+    pageSettings.add(groupBehavior);
 
-    const rowSmooth = new Adw.ActionRow({ title: _('Smooth tick (align to second)') });
-    const swSmooth = new Gtk.Switch({ active: settings.get_boolean('smooth-second') });
-    swSmooth.connect('notify::active', w => settings.set_boolean('smooth-second', w.active));
-    rowSmooth.add_suffix(swSmooth);
-    rowSmooth.activatable_widget = swSmooth;
-    group.add(rowSmooth);
-
-    const rowIcon = new Adw.ActionRow({
-      title: _('Show panel access icon'),
-      subtitle: _('Clock icon in the top bar — click for preferences, presets, and copy time'),
-    });
-    const swIcon = new Gtk.Switch({ active: settings.get_boolean('show-panel-icon') });
-    swIcon.connect('notify::active', w => settings.set_boolean('show-panel-icon', w.active));
-    rowIcon.add_suffix(swIcon);
-    rowIcon.activatable_widget = swIcon;
-    group.add(rowIcon);
-
-    const rowClockMenu = new Adw.ActionRow({
-      title: _('Right-click clock for quick menu'),
-      subtitle: _('Right-click or middle-click the formatted clock. Left-click still opens the GNOME calendar.'),
-    });
-    const swClockMenu = new Gtk.Switch({ active: settings.get_boolean('clock-secondary-opens-menu') });
-    swClockMenu.connect('notify::active', w => settings.set_boolean('clock-secondary-opens-menu', w.active));
-    rowClockMenu.add_suffix(swClockMenu);
-    rowClockMenu.activatable_widget = swClockMenu;
-    group.add(rowClockMenu);
-
-    pageSettings.add(group);
+    const groupAccess = new Adw.PreferencesGroup({ title: _('Quick access') });
+    groupAccess.add(switchRow(settings, 'show-panel-icon',
+      _('Show panel icon'),
+      _('Clock icon in the top bar with presets, copy time and preferences')));
+    groupAccess.add(switchRow(settings, 'clock-secondary-opens-menu',
+      _('Right-click clock for quick menu'),
+      _('Right-click or middle-click the clock. Left-click still opens the GNOME calendar.')));
+    pageSettings.add(groupAccess);
 
     const groupPresets = new Adw.PreferencesGroup({
       title: _('Format presets'),
-      description: _('One-click formats — uses your system locale and timezone worldwide'),
+      description: _('One-click formats — the sample uses your system locale and timezone'),
     });
-    const applyPreset = preset => {
-      applyPresetToSettings(settings, preset);
-      entry.text = settings.get_string('format-string');
-      if (typeof spin.set_value === 'function')
-        spin.set_value(settings.get_int('update-interval'));
-      swOnly.active = settings.get_boolean('only-topbar');
-      swSmooth.active = settings.get_boolean('smooth-second');
-      refreshPreview();
-    };
     for (const preset of FORMAT_PRESETS) {
-      const row = new Adw.ActionRow({
-        title: _(preset.label),
-        subtitle: preset.fmt,
-      });
+      const row = new Adw.ActionRow({ title: _(preset.label) });
+      row.add_css_class('property');
       const btn = new Gtk.Button({ label: _('Apply'), valign: Gtk.Align.CENTER });
-      btn.connect('clicked', () => applyPreset(preset));
+      btn.connect('clicked', () => applyPresetToSettings(settings, preset));
       row.add_suffix(btn);
       row.activatable_widget = btn;
       groupPresets.add(row);
+      presetRows.push([row, preset]);
     }
     pageSettings.add(groupPresets);
 
     const groupReset = new Adw.PreferencesGroup();
-    const rowReset = new Adw.ActionRow({ title: _('Reset to defaults') });
-    const btnReset = new Gtk.Button({ label: _('Reset') });
+    const rowReset = new Adw.ActionRow({
+      title: _('Reset to defaults'),
+      subtitle: _('Restore every setting on this page'),
+    });
+    const btnReset = new Gtk.Button({
+      label: _('Reset'), valign: Gtk.Align.CENTER, css_classes: ['destructive-action'],
+    });
     btnReset.connect('clicked', () => {
-      try {
-        settings.reset('format-string');
-        settings.reset('update-interval');
-        settings.reset('smooth-second');
-        settings.reset('only-topbar');
-        settings.reset('show-panel-icon');
-        settings.reset('clock-secondary-opens-menu');
-        entry.text = settings.get_string('format-string');
-        if (typeof spin.set_value === 'function')
-          spin.set_value(settings.get_int('update-interval'));
-        swOnly.active = settings.get_boolean('only-topbar');
-        swSmooth.active = settings.get_boolean('smooth-second');
-        swIcon.active = settings.get_boolean('show-panel-icon');
-        swClockMenu.active = settings.get_boolean('clock-secondary-opens-menu');
-        refreshPreview();
-      } catch (_) {}
+      for (const key of SETTING_KEYS)
+        settings.reset(key);
     });
     rowReset.add_suffix(btnReset);
+    rowReset.activatable_widget = btnReset;
     groupReset.add(rowReset);
     pageSettings.add(groupReset);
 
+    // ── About page ──────────────────────────────────────────────────
     const pageAbout = new Adw.PreferencesPage({
       title: _('About'),
       icon_name: 'help-about-symbolic',
     });
 
     const groupInfo = new Adw.PreferencesGroup({ title: _('Extension') });
-    groupInfo.add(new Adw.ActionRow({
-      title: _('Name'),
-      subtitle: metadata.name || 'Numeric Clock',
-    }));
-    groupInfo.add(new Adw.ActionRow({
-      title: _('Version'),
-      subtitle: metadata['version-name'] || String(metadata.version ?? ''),
-    }));
-    groupInfo.add(new Adw.ActionRow({
-      title: _('Developer'),
-      subtitle: AUTHOR,
-    }));
-    groupInfo.add(new Adw.ActionRow({
-      title: _('Contact'),
-      subtitle: EMAIL,
-    }));
-    groupInfo.add(new Adw.ActionRow({
-      title: _('Description'),
-      subtitle: _('International numeric top-bar clock — configurable date/time format, panel icon, and live preview.'),
-    }));
+    const infoRow = (title, subtitle) => {
+      const row = new Adw.ActionRow({ title, subtitle, subtitle_selectable: true });
+      row.add_css_class('property');
+      groupInfo.add(row);
+    };
+    infoRow(_('Name'), metadata.name || 'Numeric Clock');
+    infoRow(_('Version'), metadata['version-name'] || String(metadata.version ?? ''));
+    infoRow(_('Developer'), AUTHOR);
+    infoRow(_('Description'),
+      _('International numeric top-bar clock — configurable date/time format, panel icon, and live preview.'));
     pageAbout.add(groupInfo);
 
     const groupLinks = new Adw.PreferencesGroup({ title: _('Links') });
-    const addLinkRow = (title, uri) => {
-      const row = new Adw.ActionRow({ title });
-      row.activatable = true;
-      row.connect('activated', () => {
-        try { Gio.AppInfo.launch_default_for_uri(uri, null); } catch (_) {}
-      });
+    const addLinkRow = (title, uri, icon = 'go-next-symbolic') => {
+      const row = new Adw.ActionRow({ title, activatable: true });
+      row.add_suffix(new Gtk.Image({ icon_name: icon }));
+      row.connect('activated', () => launchUri(uri));
       groupLinks.add(row);
     };
     addLinkRow(_('GitHub repository'), REPO_URL);
-    addLinkRow(_('README and documentation'), `${REPO_URL}#readme`);
     addLinkRow(_('Report an issue'), `${REPO_URL}/issues`);
     addLinkRow(_('Latest release'), `${REPO_URL}/releases/latest`);
-
-    const rowDonate = new Adw.ActionRow({ title: _('Donate via PayPal') });
-    rowDonate.activatable = true;
-    rowDonate.connect('activated', () => {
-      try { Gio.AppInfo.launch_default_for_uri('https://www.paypal.com/donate/?hosted_button_id=4HM44VH47LSMW', null); } catch (_) {}
-    });
-    groupLinks.add(rowDonate);
-
-    const rowEmail = new Adw.ActionRow({ title: EMAIL });
-    rowEmail.activatable = true;
-    rowEmail.connect('activated', () => {
-      try { Gio.AppInfo.launch_default_for_uri(`mailto:${EMAIL}`, null); } catch (_) {}
-    });
-    groupLinks.add(rowEmail);
+    addLinkRow(_('Donate via PayPal'), DONATE_URL);
+    addLinkRow(EMAIL, `mailto:${EMAIL}`, 'mail-unread-symbolic');
     pageAbout.add(groupLinks);
 
     window.add(pageSettings);
     window.add(pageAbout);
+
+    // Trim over-long formats; settings.bind() writes the trimmed text back.
+    rowFmt.connect('changed', () => {
+      if (rowFmt.text.length > MAX_FORMAT_LENGTH)
+        rowFmt.text = rowFmt.text.slice(0, MAX_FORMAT_LENGTH);
+    });
+    const settingsIds = [
+      settings.connect('changed::format-string', restartPreviewTimer),
+      settings.connect('changed::update-interval', restartPreviewTimer),
+    ];
+    restartPreviewTimer();
+
+    // The prefs process outlives the window; stop the timer and signals with it.
+    window.connect('close-request', () => {
+      if (previewTimer) GLib.source_remove(previewTimer);
+      previewTimer = 0;
+      for (const id of settingsIds)
+        settings.disconnect(id);
+      return false;
+    });
   }
 }

@@ -12,12 +12,12 @@ CHANGELOG = REPO_ROOT / "CHANGELOG.md"
 FOOTER = """
 ## Compatibility
 
-- **GNOME Shell 45–50** — Wayland and X11/Xorg session types supported
+- **GNOME Shell 45–51** — Wayland and X11/Xorg session types supported
 - **Maintainer runtime-tested (when noted in changelog):** X11/Xorg only unless a release explicitly states otherwise
 
 ## Install
 
-Download **`numeric-clock@nickotmazgin.v*.shell-extension.zip`** from this release (GNOME Shell **45–50**), then:
+Download **`numeric-clock@nickotmazgin.v*.shell-extension.zip`** from this release (GNOME Shell **45–51**), then:
 
 ```bash
 gnome-extensions install --force numeric-clock@nickotmazgin.v*.shell-extension.zip
