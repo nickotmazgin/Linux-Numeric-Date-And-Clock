@@ -32,6 +32,7 @@ A lightweight GNOME Shell extension that replaces the top-bar clock with a **num
 * **Latest release (ZIPs):** [GitHub Releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases/latest)
 * **Privacy:** [PRIVACY.md](PRIVACY.md)
 * **Security:** [SECURITY.md](SECURITY.md)
+* **Support:** [SUPPORT.md](.github/SUPPORT.md) · **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md)
 * **Issues:** [Report a bug](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/issues)
 * **Discussions:** [Ask a question](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions)
 

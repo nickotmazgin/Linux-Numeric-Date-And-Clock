@@ -17,7 +17,9 @@
 - New preset: **ISO date + week number** (`%Y-%m-%d W%V %H:%M`)
 - Preferences rebuilt with libadwaita rows bound directly to settings, so changes from the panel menu show up live; presets show a live sample; new **format codes** cheat sheet; search; the preview timer stops when the window closes
 - Strings marked for translation with the extension's gettext domain
-- Repository: ESLint + ShellCheck CI, nested GNOME Shell smoke test (`tools/nested-smoke-test.sh`), deterministic `tools/build.sh`, `tools/validate.sh` checks the zip against `src/metadata.json`, CONTRIBUTING and Code of Conduct
+- Repository: ESLint + ShellCheck CI, nested GNOME Shell smoke test (`tools/nested-smoke-test.sh`), deterministic `tools/build.sh`, `tools/validate.sh` checks the zip against `src/metadata.json`, CONTRIBUTING, Code of Conduct, SUPPORT, release checklist, Discussions link in the issue chooser
+- Release zips now get a Sigstore build-provenance attestation (`gh attestation verify`), like EaseHub
+- Panel icon uses the Adwaita symbolic fill color like the other extensions
 
 > **Recommended upgrade** for everyone on v17.4.4 and earlier.
 

@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-  <path fill="currentColor" fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z"/>
-  <rect fill="currentColor" x="7" y="4" width="2" height="5" rx="1"/>
-  <rect fill="currentColor" x="7" y="7" width="5" height="2" rx="1"/>
+  <!-- Numeric Clock: clock face with hands at 3 o'clock, drawn on the 16 px grid -->
+  <path fill="#2e3436" fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z"/>
+  <rect fill="#2e3436" x="7" y="4" width="2" height="5" rx="1"/>
+  <rect fill="#2e3436" x="7" y="7" width="5" height="2" rx="1"/>
 </svg>

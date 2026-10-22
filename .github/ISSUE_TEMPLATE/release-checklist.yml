@@ -1,0 +1,44 @@
+name: "Release Checklist"
+description: "Checklist to prepare a new GitHub release"
+title: "Release: v<version>"
+labels:
+  - "release"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this checklist to prepare a clean, signed and attested GitHub release.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: "17.5.0"
+    validations:
+      required: true
+  - type: checkboxes
+    id: prep
+    attributes:
+      label: Prepare
+      options:
+        - label: "Bump src/metadata.json `version` and `version-name` (\"<release> <first>.<last>\")"
+        - label: "Add a `## v<version> — <date>` entry to CHANGELOG.md"
+        - label: "Update README / SECURITY / SUPPORT / bug template if the GNOME range changed"
+        - label: "Check the GNOME Shell porting guide for every new major in `shell-version`"
+  - type: checkboxes
+    id: package
+    attributes:
+      label: Package and test
+      options:
+        - label: "./tools/build.sh && ./tools/validate.sh"
+        - label: "./tools/nested-smoke-test.sh prints SMOKE TEST PASSED"
+        - label: "npx -y eslint@9 . is clean"
+        - label: "Installed on the maintainer desktop; journalctl shows no Numeric Clock errors"
+  - type: checkboxes
+    id: publish
+    attributes:
+      label: Publish
+      options:
+        - label: "./tools/setup-release-signing.sh (first time only)"
+        - label: "./tools/release-publish.sh from clean main (SSH-signed tag → Actions)"
+        - label: "Release is Verified, immutable, and `gh attestation verify` passes for the zip"
+        - label: "Update the GitHub repo description if the GNOME range changed"
