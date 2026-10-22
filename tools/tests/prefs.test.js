@@ -31,6 +31,10 @@ app.connect('activate', () => {
     ok('external change shown', row.text === '%Y-%m-%d', row.text);
     s.reset('format-string');
     ok('reset shown', row.text === '%d/%m/%Y %H:%M:%S', row.text);
+    const win2 = new Adw.PreferencesWindow({ application: app });
+    s.set_string('prefs-page', 'about');
+    p.fillPreferencesWindow(win2);
+    ok('about page requested', win2.get_visible_page()?.title === 'About' && s.get_string('prefs-page') === 'settings', win2.get_visible_page()?.title);
     app.quit();
     return GLib.SOURCE_REMOVE;
   });

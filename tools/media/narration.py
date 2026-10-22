@@ -8,7 +8,7 @@ NARRATION = {
     'title': 'Meet Numeric Clock: a clear, numeric date and time for your GNOME top bar.',
     'clock': 'Day, month, year, and seconds, in any format you like. It ticks exactly on the second.',
     'tooltip': 'Hover the clock icon to see the time, and what each click does.',
-    'menu': 'Left-click opens the quick menu: copy the time, pick a preset, change the style, or open Preferences.',
+    'menu': 'Left-click opens the quick menu: copy the time, presets, the menu style, Preferences, About, and a donate link.',
     'presets': 'Presets switch the format instantly: ISO 8601, week numbers, twelve-hour time, and more.',
     'styles': 'Choose a menu style: follow the system, or always light, or always dark.',
     'copy': 'Middle-click the icon to copy the current time to the clipboard.',

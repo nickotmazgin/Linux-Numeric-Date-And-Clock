@@ -62,5 +62,14 @@
       <summary>Panel icon middle-click</summary>
       <description>What middle-clicking the panel icon does: open the quick menu, open Preferences, or copy the current time.</description>
     </key>
+    <key name="prefs-page" type="s">
+      <choices>
+        <choice value="settings"/>
+        <choice value="about"/>
+      </choices>
+      <default>'settings'</default>
+      <summary>Preferences page to open</summary>
+      <description>Set to 'about' by the quick menu's About item; Preferences opens that page and sets it back to 'settings'.</description>
+    </key>
   </schema>
 </schemalist>
