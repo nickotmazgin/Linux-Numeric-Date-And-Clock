@@ -14,6 +14,7 @@
 [![Stars](https://img.shields.io/github/stars/nickotmazgin/Linux-Numeric-Date-And-Clock?style=flat&color=yellow)](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/stargazers)
 [![YouTube demo](https://img.shields.io/badge/YouTube-demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/VlcEy6rQHBw)
 [![DEV article](https://img.shields.io/badge/DEV-article-0A0A0A?logo=devdotto&logoColor=white)](https://dev.to/nickotmazgin/numeric-clock-176-a-numeric-date-and-time-for-the-gnome-top-bar-now-with-gnome-51-menu-styles-51oh)
+[![AlternativeTo](https://img.shields.io/badge/AlternativeTo-Numeric%20Clock-1A73E8)](https://alternativeto.net/software/numeric-clock/about/)
 [![i18n](https://img.shields.io/badge/i18n-gettext-blue)](#features)
 
 A lightweight **GNOME Shell extension** that turns the top-bar clock into a **numeric, fully configurable date and time** — **DD/MM/YYYY**, **ISO 8601 (YYYY-MM-DD)**, **24-hour** or **12-hour** time, with **seconds**, **weekday** or **ISO week number** — using any `strftime` format, anywhere in the world.
@@ -366,7 +367,9 @@ Every AI-assisted change is human-reviewed, tested on real GNOME sessions, and a
 
 **Search for:** GNOME numeric clock, GNOME top bar date format, change GNOME clock format, DD/MM/YYYY clock GNOME, ISO 8601 clock Linux, GNOME clock seconds, 24 hour clock GNOME, GNOME week number top bar
 
-**Also:** [Demo video](#demo-video) · [YouTube](https://youtu.be/VlcEy6rQHBw) · [DEV article](https://dev.to/nickotmazgin/numeric-clock-176-a-numeric-date-and-time-for-the-gnome-top-bar-now-with-gnome-51-menu-styles-51oh) · [v17.6.0 announcement](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/76) · [Overview & downloads discussion](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/9) · [Releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases) · [Changelog](CHANGELOG.md)
+**Also:** [Demo video](#demo-video) · [YouTube](https://youtu.be/VlcEy6rQHBw) · [DEV article](https://dev.to/nickotmazgin/numeric-clock-176-a-numeric-date-and-time-for-the-gnome-top-bar-now-with-gnome-51-menu-styles-51oh) · [v17.6.0 announcement](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/76) · [Overview & downloads discussion](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/discussions/9) · [AlternativeTo](https://alternativeto.net/software/numeric-clock/about/) · [Releases](https://github.com/nickotmazgin/Linux-Numeric-Date-And-Clock/releases) · [Changelog](CHANGELOG.md)
+
+<a href="https://alternativeto.net/software/numeric-clock/about/?utm_source=badge&utm_medium=referral" target="_blank"><img src="https://alternativeto.net/static/badges/badge-compact-color.svg" alt="Numeric Clock | AlternativeTo" width="244" height="79" /></a>
 
 ## More GNOME extensions by Nick Otmazgin
 
