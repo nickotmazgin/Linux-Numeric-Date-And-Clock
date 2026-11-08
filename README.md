@@ -33,6 +33,8 @@ Stock GNOME shows `Oct 22  13:17` and offers no date-format setting. Numeric Clo
 
 > **GNOME Shell 42–44 is no longer supported.** Numeric Clock requires **GNOME 45–51**.
 
+> **Not on extensions.gnome.org.** The listings there are old, unmaintained builds that I no longer control, so please don't install them. GitHub is the only current source.
+
 ---
 
 ## Quick links
